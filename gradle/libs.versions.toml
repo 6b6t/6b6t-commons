@@ -1,0 +1,66 @@
+[versions]
+# Java
+java = "21"
+
+# MariaDB
+mariadb = "3.5.3"
+hikaricp = "6.2.1"
+
+# ConfigLib
+configlib = "4.5.0"
+
+# Adventure (MiniMessage)
+adventure = "4.18.0"
+adventure-platform = "4.3.4"
+
+# Paper API
+paper-api = "1.21.4-R0.1-SNAPSHOT"
+
+# Velocity API
+velocity-api = "3.4.0-SNAPSHOT"
+
+# Annotations
+jetbrains-annotations = "26.0.1"
+spotbugs-annotations = "4.8.6"
+jspecify = "1.0.0"
+
+# Testing
+junit = "5.11.4"
+mockito = "5.14.2"
+
+[libraries]
+# Database
+mariadb-java-client = { module = "org.mariadb.jdbc:mariadb-java-client", version.ref = "mariadb" }
+hikaricp = { module = "com.zaxxer:HikariCP", version.ref = "hikaricp" }
+
+# ConfigLib
+configlib-yaml = { module = "de.exlll:configlib-yaml", version.ref = "configlib" }
+configlib-paper = { module = "de.exlll:configlib-paper", version.ref = "configlib" }
+
+# Adventure
+adventure-api = { module = "net.kyori:adventure-api", version.ref = "adventure" }
+adventure-text-minimessage = { module = "net.kyori:adventure-text-minimessage", version.ref = "adventure" }
+adventure-platform-bukkit = { module = "net.kyori:adventure-platform-bukkit", version.ref = "adventure-platform" }
+
+# Paper/Velocity API
+paper-api = { module = "io.papermc.paper:paper-api", version.ref = "paper-api" }
+velocity-api = { module = "com.velocitypowered:velocity-api", version.ref = "velocity-api" }
+
+# Annotations
+jetbrains-annotations = { module = "org.jetbrains:annotations", version.ref = "jetbrains-annotations" }
+spotbugs-annotations = { module = "com.github.spotbugs:spotbugs-annotations", version.ref = "spotbugs-annotations" }
+jspecify = { module = "org.jspecify:jspecify", version.ref = "jspecify" }
+
+# Testing
+junit-bom = { module = "org.junit:junit-bom", version.ref = "junit" }
+junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit" }
+junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher" }
+mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockito" }
+mockito-junit-jupiter = { module = "org.mockito:mockito-junit-jupiter", version.ref = "mockito" }
+
+[bundles]
+testing = ["junit-jupiter", "mockito-core", "mockito-junit-jupiter"]
+annotations = ["jetbrains-annotations", "spotbugs-annotations", "jspecify"]
+adventure = ["adventure-api", "adventure-text-minimessage"]
+
+[plugins]
