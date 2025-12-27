@@ -2,37 +2,23 @@ package net.blockhost.commons.database;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
 import java.util.Map;
 import java.util.Objects;
 
-/**
- * Builder for creating HikariCP connection pool data sources.
- *
- * <p>This builder provides a fluent API for configuring HikariCP connection pools
- * with sensible defaults for MariaDB connections. It integrates with
- * {@link DatabaseCredentials} for easy configuration.
- *
- * <p>Example usage:
- * <pre>{@code
- * DatabaseCredentials credentials = DatabaseCredentials.builder()
- *     .host("localhost")
- *     .database("mydb")
- *     .username("user")
- *     .password("pass")
- *     .build();
- *
- * HikariDataSource dataSource = HikariDataSourceBuilder.create(credentials)
- *     .poolName("MyApp-Pool")
- *     .maximumPoolSize(10)
- *     .build();
- * }</pre>
- *
- * @see DatabaseCredentials
- * @see HikariDataSource
- */
+/// Builder for creating HikariCP connection pool data sources.
+///
+/// This builder provides a fluent API for configuring HikariCP connection pools
+/// with sensible defaults for MariaDB connections. It integrates with
+/// [DatabaseCredentials] for easy configuration.
+///
+/// Example usage:
+/// <pre>
+/// `DatabaseCredentials credentials = DatabaseCredentials.builder().host("localhost").database("mydb").username("user").password("pass").build();HikariDataSource dataSource = HikariDataSourceBuilder.create(credentials).poolName("MyApp-Pool").maximumPoolSize(10).build();`</pre>
+///
+/// @see DatabaseCredentials
+/// @see HikariDataSource
 public final class HikariDataSourceBuilder {
 
     private static final String DRIVER_CLASS = "org.mariadb.jdbc.Driver";
@@ -51,69 +37,59 @@ public final class HikariDataSourceBuilder {
     private int prepStmtCacheSqlLimit = 2048;
     private boolean autoReconnect = true;
 
-    private HikariDataSourceBuilder(@NotNull DatabaseCredentials credentials) {
+    private HikariDataSourceBuilder(DatabaseCredentials credentials) {
         this.credentials = Objects.requireNonNull(credentials, "credentials");
         this.connectionTimeout = credentials.connectionTimeout();
     }
 
-    /**
-     * Creates a new builder with the specified credentials.
-     *
-     * @param credentials the database credentials
-     * @return a new builder instance
-     */
-    public static @NotNull HikariDataSourceBuilder create(@NotNull DatabaseCredentials credentials) {
+    /// Creates a new builder with the specified credentials.
+    ///
+    /// @param credentials the database credentials
+    /// @return a new builder instance
+    public static HikariDataSourceBuilder create(DatabaseCredentials credentials) {
         return new HikariDataSourceBuilder(credentials);
     }
 
-    /**
-     * Creates a new builder from a {@link DatabaseConfig}.
-     *
-     * <p>This is a convenience method that converts the config to credentials
-     * and applies the pool size settings from the config.
-     *
-     * @param config the database configuration
-     * @return a new builder instance with pool settings applied
-     */
-    public static @NotNull HikariDataSourceBuilder create(@NotNull DatabaseConfig config) {
+    /// Creates a new builder from a [DatabaseConfig].
+    ///
+    /// This is a convenience method that converts the config to credentials
+    /// and applies the pool size settings from the config.
+    ///
+    /// @param config the database configuration
+    /// @return a new builder instance with pool settings applied
+    public static HikariDataSourceBuilder create(DatabaseConfig config) {
         Objects.requireNonNull(config, "config");
         return new HikariDataSourceBuilder(config.toCredentials())
                 .maximumPoolSize(config.maxPoolSize())
                 .minimumIdle(config.minIdle());
     }
 
-    /**
-     * Creates and builds a HikariDataSource directly from a {@link DatabaseConfig}.
-     *
-     * <p>This is a convenience method for quick setup when default settings are acceptable.
-     *
-     * @param config the database configuration
-     * @return a new HikariDataSource instance
-     */
-    public static @NotNull HikariDataSource createDataSource(@NotNull DatabaseConfig config) {
+    /// Creates and builds a HikariDataSource directly from a [DatabaseConfig].
+    ///
+    /// This is a convenience method for quick setup when default settings are acceptable.
+    ///
+    /// @param config the database configuration
+    /// @return a new HikariDataSource instance
+    public static HikariDataSource createDataSource(DatabaseConfig config) {
         return create(config).build();
     }
 
-    /**
-     * Sets the name of the connection pool.
-     *
-     * <p>This name will appear in thread names and JMX metrics.
-     *
-     * @param poolName the pool name
-     * @return this builder
-     */
-    public @NotNull HikariDataSourceBuilder poolName(@NotNull String poolName) {
+    /// Sets the name of the connection pool.
+    ///
+    /// This name will appear in thread names and JMX metrics.
+    ///
+    /// @param poolName the pool name
+    /// @return this builder
+    public HikariDataSourceBuilder poolName(String poolName) {
         this.poolName = Objects.requireNonNull(poolName, "poolName");
         return this;
     }
 
-    /**
-     * Sets the maximum size of the connection pool.
-     *
-     * @param size the maximum pool size (must be at least 1)
-     * @return this builder
-     */
-    public @NotNull HikariDataSourceBuilder maximumPoolSize(int size) {
+    /// Sets the maximum size of the connection pool.
+    ///
+    /// @param size the maximum pool size (must be at least 1)
+    /// @return this builder
+    public HikariDataSourceBuilder maximumPoolSize(int size) {
         if (size < 1) {
             throw new IllegalArgumentException("Maximum pool size must be at least 1: " + size);
         }
@@ -121,13 +97,11 @@ public final class HikariDataSourceBuilder {
         return this;
     }
 
-    /**
-     * Sets the minimum number of idle connections in the pool.
-     *
-     * @param size the minimum idle connections (must be non-negative)
-     * @return this builder
-     */
-    public @NotNull HikariDataSourceBuilder minimumIdle(int size) {
+    /// Sets the minimum number of idle connections in the pool.
+    ///
+    /// @param size the minimum idle connections (must be non-negative)
+    /// @return this builder
+    public HikariDataSourceBuilder minimumIdle(int size) {
         if (size < 0) {
             throw new IllegalArgumentException("Minimum idle must be non-negative: " + size);
         }
@@ -135,100 +109,82 @@ public final class HikariDataSourceBuilder {
         return this;
     }
 
-    /**
-     * Sets the maximum lifetime of a connection in the pool.
-     *
-     * @param maxLifetime the maximum lifetime
-     * @return this builder
-     */
-    public @NotNull HikariDataSourceBuilder maxLifetime(@NotNull Duration maxLifetime) {
+    /// Sets the maximum lifetime of a connection in the pool.
+    ///
+    /// @param maxLifetime the maximum lifetime
+    /// @return this builder
+    public HikariDataSourceBuilder maxLifetime(Duration maxLifetime) {
         this.maxLifetime = Objects.requireNonNull(maxLifetime, "maxLifetime");
         return this;
     }
 
-    /**
-     * Sets the maximum time a connection can be idle before being retired.
-     *
-     * @param idleTimeout the idle timeout
-     * @return this builder
-     */
-    public @NotNull HikariDataSourceBuilder idleTimeout(@NotNull Duration idleTimeout) {
+    /// Sets the maximum time a connection can be idle before being retired.
+    ///
+    /// @param idleTimeout the idle timeout
+    /// @return this builder
+    public HikariDataSourceBuilder idleTimeout(Duration idleTimeout) {
         this.idleTimeout = Objects.requireNonNull(idleTimeout, "idleTimeout");
         return this;
     }
 
-    /**
-     * Sets the maximum time to wait for a connection from the pool.
-     *
-     * @param connectionTimeout the connection timeout
-     * @return this builder
-     */
-    public @NotNull HikariDataSourceBuilder connectionTimeout(@NotNull Duration connectionTimeout) {
+    /// Sets the maximum time to wait for a connection from the pool.
+    ///
+    /// @param connectionTimeout the connection timeout
+    /// @return this builder
+    public HikariDataSourceBuilder connectionTimeout(Duration connectionTimeout) {
         this.connectionTimeout = Objects.requireNonNull(connectionTimeout, "connectionTimeout");
         return this;
     }
 
-    /**
-     * Sets the timeout for connection validation.
-     *
-     * @param validationTimeout the validation timeout
-     * @return this builder
-     */
-    public @NotNull HikariDataSourceBuilder validationTimeout(@NotNull Duration validationTimeout) {
+    /// Sets the timeout for connection validation.
+    ///
+    /// @param validationTimeout the validation timeout
+    /// @return this builder
+    public HikariDataSourceBuilder validationTimeout(Duration validationTimeout) {
         this.validationTimeout = Objects.requireNonNull(validationTimeout, "validationTimeout");
         return this;
     }
 
-    /**
-     * Enables or disables prepared statement caching.
-     *
-     * @param enabled true to enable caching
-     * @return this builder
-     */
-    public @NotNull HikariDataSourceBuilder cachePreparedStatements(boolean enabled) {
+    /// Enables or disables prepared statement caching.
+    ///
+    /// @param enabled true to enable caching
+    /// @return this builder
+    public HikariDataSourceBuilder cachePreparedStatements(boolean enabled) {
         this.cachePrepStmts = enabled;
         return this;
     }
 
-    /**
-     * Sets the prepared statement cache size.
-     *
-     * @param size the cache size
-     * @return this builder
-     */
-    public @NotNull HikariDataSourceBuilder preparedStatementCacheSize(int size) {
+    /// Sets the prepared statement cache size.
+    ///
+    /// @param size the cache size
+    /// @return this builder
+    public HikariDataSourceBuilder preparedStatementCacheSize(int size) {
         this.prepStmtCacheSize = size;
         return this;
     }
 
-    /**
-     * Sets the maximum length of a prepared statement SQL that can be cached.
-     *
-     * @param limit the SQL length limit
-     * @return this builder
-     */
-    public @NotNull HikariDataSourceBuilder preparedStatementCacheSqlLimit(int limit) {
+    /// Sets the maximum length of a prepared statement SQL that can be cached.
+    ///
+    /// @param limit the SQL length limit
+    /// @return this builder
+    public HikariDataSourceBuilder preparedStatementCacheSqlLimit(int limit) {
         this.prepStmtCacheSqlLimit = limit;
         return this;
     }
 
-    /**
-     * Enables or disables auto-reconnect.
-     *
-     * @param enabled true to enable auto-reconnect
-     * @return this builder
-     */
-    public @NotNull HikariDataSourceBuilder autoReconnect(boolean enabled) {
+    /// Enables or disables auto-reconnect.
+    ///
+    /// @param enabled true to enable auto-reconnect
+    /// @return this builder
+    public HikariDataSourceBuilder autoReconnect(boolean enabled) {
         this.autoReconnect = enabled;
         return this;
     }
 
-    /**
-     * Builds the HikariDataSource with the configured settings.
-     *
-     * @return a new HikariDataSource instance
-     */
-    public @NotNull HikariDataSource build() {
+    /// Builds the HikariDataSource with the configured settings.
+    ///
+    /// @return a new HikariDataSource instance
+    public HikariDataSource build() {
         HikariConfig config = new HikariConfig();
 
         // Basic connection settings

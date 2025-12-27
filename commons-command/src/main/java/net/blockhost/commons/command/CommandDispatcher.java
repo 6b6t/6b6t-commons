@@ -15,33 +15,17 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 
-/**
- * Dispatcher for handling commands with multiple subcommands.
- *
- * <p>This class implements both {@link CommandExecutor} and {@link TabCompleter}
- * to provide a complete command handling solution. It routes incoming commands
- * to the appropriate {@link SubCommand} based on the first argument.
- *
- * <p>Example usage:
- * <pre>{@code
- * CommandDispatcher dispatcher = CommandDispatcher.builder()
- *     .defaultSubCommand("help")
- *     .playerOnlyMessage(Component.text("This command is for players only!", NamedTextColor.RED))
- *     .unknownSubCommandHandler((player, args) -> {
- *         player.sendMessage(Component.text("Unknown command: " + args[0]));
- *     })
- *     .register(new HelpSubCommand())
- *     .register(new TeleportSubCommand())
- *     .register(new SettingsSubCommand())
- *     .build();
- *
- * // Register with Bukkit
- * plugin.getCommand("mycommand").setExecutor(dispatcher);
- * plugin.getCommand("mycommand").setTabCompleter(dispatcher);
- * }</pre>
- *
- * @see SubCommand
- */
+/// Dispatcher for handling commands with multiple subcommands.
+///
+/// This class implements both [CommandExecutor] and [TabCompleter]
+/// to provide a complete command handling solution. It routes incoming commands
+/// to the appropriate [SubCommand] based on the first argument.
+///
+/// Example usage:
+/// <pre>
+/// `CommandDispatcher dispatcher = CommandDispatcher.builder().defaultSubCommand("help").playerOnlyMessage(Component.text("This command is for players only!", NamedTextColor.RED)).unknownSubCommandHandler((player, args) ->{player.sendMessage(Component.text("Unknown command: " + args[0]));}).register(new HelpSubCommand()).register(new TeleportSubCommand()).register(new SettingsSubCommand()).build();// Register with Bukkitplugin.getCommand("mycommand").setExecutor(dispatcher);plugin.getCommand("mycommand").setTabCompleter(dispatcher);`</pre>
+///
+/// @see SubCommand
 public final class CommandDispatcher implements CommandExecutor, TabCompleter {
 
     private final List<SubCommand> subCommands;
@@ -56,11 +40,9 @@ public final class CommandDispatcher implements CommandExecutor, TabCompleter {
         this.nonPlayerHandler = builder.nonPlayerHandler;
     }
 
-    /**
-     * Creates a new builder for CommandDispatcher.
-     *
-     * @return a new builder instance
-     */
+    /// Creates a new builder for CommandDispatcher.
+    ///
+    /// @return a new builder instance
     public static @NotNull Builder builder() {
         return new Builder();
     }
@@ -128,12 +110,10 @@ public final class CommandDispatcher implements CommandExecutor, TabCompleter {
         return completions;
     }
 
-    /**
-     * Finds a subcommand by name or alias.
-     *
-     * @param name the name or alias to search for
-     * @return an Optional containing the subcommand if found
-     */
+    /// Finds a subcommand by name or alias.
+    ///
+    /// @param name the name or alias to search for
+    /// @return an Optional containing the subcommand if found
     public @NotNull Optional<SubCommand> findSubCommand(@NotNull String name) {
         for (SubCommand sc : subCommands) {
             if (sc.getName().equalsIgnoreCase(name)) {
@@ -148,18 +128,14 @@ public final class CommandDispatcher implements CommandExecutor, TabCompleter {
         return Optional.empty();
     }
 
-    /**
-     * Returns an unmodifiable list of registered subcommands.
-     *
-     * @return the list of subcommands
-     */
+    /// Returns an unmodifiable list of registered subcommands.
+    ///
+    /// @return the list of subcommands
     public @NotNull List<SubCommand> getSubCommands() {
         return List.copyOf(subCommands);
     }
 
-    /**
-     * Builder for creating {@link CommandDispatcher} instances.
-     */
+    /// Builder for creating [CommandDispatcher] instances.
     public static final class Builder {
 
         private final List<SubCommand> subCommands = new ArrayList<>();
@@ -167,25 +143,22 @@ public final class CommandDispatcher implements CommandExecutor, TabCompleter {
         private BiConsumer<Player, String[]> unknownSubCommandHandler;
         private BiConsumer<CommandSender, String[]> nonPlayerHandler;
 
-        private Builder() {}
+        private Builder() {
+        }
 
-        /**
-         * Registers a subcommand with the dispatcher.
-         *
-         * @param subCommand the subcommand to register
-         * @return this builder
-         */
+        /// Registers a subcommand with the dispatcher.
+        ///
+        /// @param subCommand the subcommand to register
+        /// @return this builder
         public @NotNull Builder register(@NotNull SubCommand subCommand) {
             this.subCommands.add(Objects.requireNonNull(subCommand, "subCommand"));
             return this;
         }
 
-        /**
-         * Registers multiple subcommands with the dispatcher.
-         *
-         * @param subCommands the subcommands to register
-         * @return this builder
-         */
+        /// Registers multiple subcommands with the dispatcher.
+        ///
+        /// @param subCommands the subcommands to register
+        /// @return this builder
         public @NotNull Builder registerAll(@NotNull SubCommand... subCommands) {
             for (SubCommand sc : subCommands) {
                 register(sc);
@@ -193,44 +166,36 @@ public final class CommandDispatcher implements CommandExecutor, TabCompleter {
             return this;
         }
 
-        /**
-         * Sets the default subcommand to execute when no arguments are provided.
-         *
-         * @param subCommandName the name of the default subcommand
-         * @return this builder
-         */
+        /// Sets the default subcommand to execute when no arguments are provided.
+        ///
+        /// @param subCommandName the name of the default subcommand
+        /// @return this builder
         public @NotNull Builder defaultSubCommand(@Nullable String subCommandName) {
             this.defaultSubCommand = subCommandName;
             return this;
         }
 
-        /**
-         * Sets the handler for unknown subcommands.
-         *
-         * @param handler the handler to invoke when an unknown subcommand is used
-         * @return this builder
-         */
+        /// Sets the handler for unknown subcommands.
+        ///
+        /// @param handler the handler to invoke when an unknown subcommand is used
+        /// @return this builder
         public @NotNull Builder unknownSubCommandHandler(@Nullable BiConsumer<Player, String[]> handler) {
             this.unknownSubCommandHandler = handler;
             return this;
         }
 
-        /**
-         * Sets the handler for non-player command senders.
-         *
-         * @param handler the handler to invoke when a non-player uses the command
-         * @return this builder
-         */
+        /// Sets the handler for non-player command senders.
+        ///
+        /// @param handler the handler to invoke when a non-player uses the command
+        /// @return this builder
         public @NotNull Builder nonPlayerHandler(@Nullable BiConsumer<CommandSender, String[]> handler) {
             this.nonPlayerHandler = handler;
             return this;
         }
 
-        /**
-         * Builds the CommandDispatcher.
-         *
-         * @return a new CommandDispatcher instance
-         */
+        /// Builds the CommandDispatcher.
+        ///
+        /// @return a new CommandDispatcher instance
         public @NotNull CommandDispatcher build() {
             return new CommandDispatcher(this);
         }
