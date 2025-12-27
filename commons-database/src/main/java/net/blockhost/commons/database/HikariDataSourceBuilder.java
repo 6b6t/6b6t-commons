@@ -15,7 +15,8 @@ import java.util.Objects;
 ///
 /// Example usage:
 /// <pre>
-/// `DatabaseCredentials credentials = DatabaseCredentials.builder().host("localhost").database("mydb").username("user").password("pass").build();HikariDataSource dataSource = HikariDataSourceBuilder.create(credentials).poolName("MyApp-Pool").maximumPoolSize(10).build();`</pre>
+/// `DatabaseCredentials credentials =
+// DatabaseCredentials.builder().host("localhost").database("mydb").username("user").password("pass").build();HikariDataSource dataSource = HikariDataSourceBuilder.create(credentials).poolName("MyApp-Pool").maximumPoolSize(10).build();`</pre>
 ///
 /// @see DatabaseCredentials
 /// @see HikariDataSource

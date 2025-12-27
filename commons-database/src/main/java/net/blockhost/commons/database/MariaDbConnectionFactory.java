@@ -15,7 +15,9 @@ import java.util.Properties;
 ///
 /// Example usage:
 /// <pre>
-/// `DatabaseCredentials credentials = DatabaseCredentials.builder().host("localhost").database("mydb").username("user").password("pass").build();try (Connection connection = MariaDbConnectionFactory.openConnection(credentials)){// Use the connection}`</pre>
+/// `DatabaseCredentials credentials =
+// DatabaseCredentials.builder().host("localhost").database("mydb").username("user").password("pass").build();try
+// (Connection connection = MariaDbConnectionFactory.openConnection(credentials)){// Use the connection}`</pre>
 ///
 /// For connection pooling, consider using [HikariDataSourceBuilder] instead.
 ///
@@ -46,8 +48,7 @@ public final class MariaDbConnectionFactory {
     /// @param applyTimeout whether to apply timeout settings from the credentials
     /// @return a new database connection
     /// @throws SQLException if a database access error occurs or the driver is not available
-    public static Connection openConnection(DatabaseCredentials credentials, boolean applyTimeout)
-            throws SQLException {
+    public static Connection openConnection(DatabaseCredentials credentials, boolean applyTimeout) throws SQLException {
         ensureDriverLoaded();
         return DriverManager.getConnection(credentials.jdbcUrl(), buildConnectionProperties(credentials, applyTimeout));
     }
@@ -65,8 +66,7 @@ public final class MariaDbConnectionFactory {
     /// @param credentials  the database credentials
     /// @param applyTimeout whether to include timeout settings
     /// @return a Properties object containing connection properties
-    public static Properties buildConnectionProperties(
-            DatabaseCredentials credentials, boolean applyTimeout) {
+    public static Properties buildConnectionProperties(DatabaseCredentials credentials, boolean applyTimeout) {
         Properties properties = new Properties();
         properties.setProperty("user", credentials.username());
         properties.setProperty("password", credentials.password());

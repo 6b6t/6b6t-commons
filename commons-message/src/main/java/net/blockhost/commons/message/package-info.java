@@ -11,11 +11,14 @@
 ///
 /// Send messages to players:
 /// <pre>
-/// `// Simple messagemessages.send(player, "welcome");// Message with placeholdersmessages.send(player, "greeting", Map.of("player", player.getName()));// Using TagResolversmessages.send(player, "balance",Placeholder.parsed("amount", String.valueOf(balance)));`</pre>
+/// `// Simple messagemessages.send(player, "welcome");// Message with placeholdersmessages.send(player, "greeting",
+// Map.of("player", player.getName()));// Using TagResolversmessages.send(player, "balance",Placeholder.parsed("amount",
+// String.valueOf(balance)));`</pre>
 ///
 /// Parse messages directly:
 /// <pre>
-/// `Component component = MessageService.parse("<green>Hello <player>!",Placeholder.parsed("player", playerName));`</pre>
+/// `Component component = MessageService.parse("<green>Hello <player>!",Placeholder.parsed("player",
+// playerName));`</pre>
 ///
 /// @see net.blockhost.commons.message.MessageService
 /// @see net.kyori.adventure.text.minimessage.MiniMessage

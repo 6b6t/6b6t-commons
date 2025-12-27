@@ -14,15 +14,22 @@ import java.time.Duration;
 ///
 /// Example usage in a plugin configuration:
 /// <pre>
-/// `class PluginConfig{settings")private DatabaseConfig database = new DatabaseConfig();public DatabaseConfig database(){return database;}}`</pre>
+/// `class PluginConfig{settings")private DatabaseConfig database = new DatabaseConfig();public DatabaseConfig
+// database(){return database;}}`</pre>
 ///
 /// This will generate a YAML file like:
 /// <pre>
-/// `# Database connection settingsdatabase:# The database server hostname or IP addresshost: localhost# The database server portport: 3306# The name of the database to connect todatabase: minecraft# The username for database authenticationusername: root# The password for database authenticationpassword: ""# Connection timeout in secondsconnectionTimeoutSeconds: 5# Maximum number of connections in the pool (for HikariCP)maxPoolSize: 10# Minimum number of idle connections in the pool (for HikariCP)minIdle: 2`</pre>
+/// `# Database connection settingsdatabase:# The database server hostname or IP addresshost: localhost# The database
+// server portport: 3306# The name of the database to connect todatabase: minecraft# The username for database
+// authenticationusername: root# The password for database authenticationpassword: ""# Connection timeout in
+// secondsconnectionTimeoutSeconds: 5# Maximum number of connections in the pool (for HikariCP)maxPoolSize: 10# Minimum
+// number of idle connections in the pool (for HikariCP)minIdle: 2`</pre>
 ///
 /// To use with the database utilities, convert to [DatabaseCredentials]:
 /// <pre>
-/// `DatabaseCredentials credentials = config.database().toCredentials();try (Connection conn = MariaDbConnectionFactory.openConnection(credentials)){// use connection}// Or use with HikariCP:HikariDataSource dataSource = HikariDataSourceBuilder.create(config.database());`</pre>
+/// `DatabaseCredentials credentials = config.database().toCredentials();try (Connection conn =
+// MariaDbConnectionFactory.openConnection(credentials)){// use connection}// Or use with HikariCP:HikariDataSource
+// dataSource = HikariDataSourceBuilder.create(config.database());`</pre>
 ///
 /// @see DatabaseCredentials
 /// @see MariaDbConnectionFactory

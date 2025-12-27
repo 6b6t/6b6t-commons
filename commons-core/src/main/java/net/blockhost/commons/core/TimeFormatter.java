@@ -11,7 +11,9 @@ import java.util.concurrent.TimeUnit;
 ///
 /// Example usage:
 /// <pre>
-/// `// Format secondsTimeFormatter.formatSeconds(3661); // "1h 1m 1s"// Format durationTimeFormatter.format(Duration.ofMinutes(90)); // "1h 30m"// Compact formatTimeFormatter.formatCompact(Duration.ofSeconds(125)); // "2:05"`</pre>
+/// `// Format secondsTimeFormatter.formatSeconds(3661); // "1h 1m 1s"// Format
+// durationTimeFormatter.format(Duration.ofMinutes(90)); // "1h 30m"// Compact
+// formatTimeFormatter.formatCompact(Duration.ofSeconds(125)); // "2:05"`</pre>
 public final class TimeFormatter {
 
     private TimeFormatter() {

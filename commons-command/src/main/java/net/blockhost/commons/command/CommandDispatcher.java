@@ -23,7 +23,12 @@ import java.util.function.BiConsumer;
 ///
 /// Example usage:
 /// <pre>
-/// `CommandDispatcher dispatcher = CommandDispatcher.builder().defaultSubCommand("help").playerOnlyMessage(Component.text("This command is for players only!", NamedTextColor.RED)).unknownSubCommandHandler((player, args) ->{player.sendMessage(Component.text("Unknown command: " + args[0]));}).register(new HelpSubCommand()).register(new TeleportSubCommand()).register(new SettingsSubCommand()).build();// Register with Bukkitplugin.getCommand("mycommand").setExecutor(dispatcher);plugin.getCommand("mycommand").setTabCompleter(dispatcher);`</pre>
+/// `CommandDispatcher dispatcher =
+// CommandDispatcher.builder().defaultSubCommand("help").playerOnlyMessage(Component.text("This command is for players
+// only!", NamedTextColor.RED)).unknownSubCommandHandler((player, args) ->{player.sendMessage(Component.text("Unknown
+// command: " + args[0]));}).register(new HelpSubCommand()).register(new TeleportSubCommand()).register(new
+// SettingsSubCommand()).build();// Register with
+// Bukkitplugin.getCommand("mycommand").setExecutor(dispatcher);plugin.getCommand("mycommand").setTabCompleter(dispatcher);`</pre>
 ///
 /// @see SubCommand
 public final class CommandDispatcher implements CommandExecutor, TabCompleter {
@@ -143,8 +148,7 @@ public final class CommandDispatcher implements CommandExecutor, TabCompleter {
         private BiConsumer<Player, String[]> unknownSubCommandHandler;
         private BiConsumer<CommandSender, String[]> nonPlayerHandler;
 
-        private Builder() {
-        }
+        private Builder() {}
 
         /// Registers a subcommand with the dispatcher.
         ///

@@ -13,7 +13,10 @@ import java.util.List;
 ///
 /// Example implementation:
 /// <pre>
-/// `public class TeleportSubCommand implements SubCommand{void execute(@NotNull Player player, @NotNull String[] args){// Handle teleport command}@NotNull String getName(){return "teleport";}@NotNull String[] getAliases(){return new String[]{"tp", "goto"};}@NotNull List<String> tabComplete(@NotNull Player player, @NotNull String[] args){if (args.length == 2){return getOnlinePlayerNames();}return List.of();}}`</pre>
+/// `public class TeleportSubCommand implements SubCommand{void execute(@NotNull Player player, @NotNull String[]
+// args){// Handle teleport command}@NotNull String getName(){return "teleport";}@NotNull String[] getAliases(){return
+// new String[]{"tp", "goto"};}@NotNull List<String> tabComplete(@NotNull Player player, @NotNull String[] args){if
+// (args.length == 2){return getOnlinePlayerNames();}return List.of();}}`</pre>
 ///
 /// @see CommandDispatcher
 public interface SubCommand {

@@ -16,7 +16,8 @@ import java.util.Objects;
 ///
 /// Use the [Builder] to create instances:
 /// <pre>
-/// `DatabaseCredentials credentials = DatabaseCredentials.builder().host("localhost").port(3306).database("mydb").username("user").password("pass").build();`</pre>
+/// `DatabaseCredentials credentials =
+// DatabaseCredentials.builder().host("localhost").port(3306).database("mydb").username("user").password("pass").build();`</pre>
 ///
 /// @see MariaDbConnectionFactory
 /// @see HikariDataSourceBuilder
@@ -113,8 +114,7 @@ public final class DatabaseCredentials {
         private Duration connectionTimeout = Duration.ofSeconds(5);
         private final Map<String, String> properties = new LinkedHashMap<>();
 
-        private Builder() {
-        }
+        private Builder() {}
 
         /// Sets the database host address.
         ///

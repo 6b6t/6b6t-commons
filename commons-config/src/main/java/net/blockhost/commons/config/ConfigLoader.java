@@ -14,7 +14,9 @@ import java.util.function.Consumer;
 ///
 /// Example usage:
 /// <pre>
-/// `// Define your configuration classclass MyConfig{private String host = "localhost";private int port = 3306;}// Load or create configurationPath configPath = dataFolder.resolve("config.yml");MyConfig config = ConfigLoader.loadOrCreate(configPath, MyConfig.class);`</pre>
+/// `// Define your configuration classclass MyConfig{private String host = "localhost";private int port = 3306;}// Load
+// or create configurationPath configPath = dataFolder.resolve("config.yml");MyConfig config =
+// ConfigLoader.loadOrCreate(configPath, MyConfig.class);`</pre>
 ///
 /// @see de.exlll.configlib.Configuration
 /// @see YamlConfigurations
@@ -51,8 +53,7 @@ public final class ConfigLoader {
     /// @param properties      the configuration properties
     /// @param <T>             the configuration type
     /// @return the loaded or created configuration
-    public static <T> T loadOrCreate(
-            Path path, Class<T> configClass, YamlConfigurationProperties properties) {
+    public static <T> T loadOrCreate(Path path, Class<T> configClass, YamlConfigurationProperties properties) {
         Objects.requireNonNull(path, "path");
         Objects.requireNonNull(configClass, "configClass");
         Objects.requireNonNull(properties, "properties");
@@ -63,7 +64,8 @@ public final class ConfigLoader {
     ///
     /// Example:
     /// <pre>
-    /// `MyConfig config = ConfigLoader.loadOrCreate(configPath,MyConfig.class,builder -> builder.header("My Plugin Configuration"));`</pre>
+    /// `MyConfig config = ConfigLoader.loadOrCreate(configPath,MyConfig.class,builder -> builder.header("My Plugin
+    // Configuration"));`</pre>
     ///
     /// @param path               the path to the configuration file
     /// @param configClass        the configuration class
@@ -71,9 +73,7 @@ public final class ConfigLoader {
     /// @param <T>                the configuration type
     /// @return the loaded or created configuration
     public static <T> T loadOrCreate(
-            Path path,
-            Class<T> configClass,
-            Consumer<YamlConfigurationProperties.Builder<?>> propertiesConsumer) {
+            Path path, Class<T> configClass, Consumer<YamlConfigurationProperties.Builder<?>> propertiesConsumer) {
         Objects.requireNonNull(path, "path");
         Objects.requireNonNull(configClass, "configClass");
         Objects.requireNonNull(propertiesConsumer, "propertiesConsumer");
@@ -102,11 +102,7 @@ public final class ConfigLoader {
     /// @param config      the configuration instance to save
     /// @param properties  the configuration properties
     /// @param <T>         the configuration type
-    public static <T> void save(
-            Path path,
-            Class<T> configClass,
-            T config,
-            YamlConfigurationProperties properties) {
+    public static <T> void save(Path path, Class<T> configClass, T config, YamlConfigurationProperties properties) {
         Objects.requireNonNull(path, "path");
         Objects.requireNonNull(configClass, "configClass");
         Objects.requireNonNull(config, "config");

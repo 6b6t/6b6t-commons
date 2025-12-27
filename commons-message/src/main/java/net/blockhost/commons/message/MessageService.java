@@ -17,7 +17,10 @@ import java.util.function.Function;
 ///
 /// Example usage:
 /// <pre>
-/// `// Create a message service with a message providerMessageService messages = MessageService.create(key -> config.getString("messages." + key));// Send a simple messagemessages.send(player, "welcome");// Send a message with placeholdersmessages.send(player, "player-joined", Map.of("player", playerName));// Or use TagResolvers directlymessages.send(player, "balance", Placeholder.parsed("amount", balance));`</pre>
+/// `// Create a message service with a message providerMessageService messages = MessageService.create(key ->
+// config.getString("messages." + key));// Send a simple messagemessages.send(player, "welcome");// Send a message with
+// placeholdersmessages.send(player, "player-joined", Map.of("player", playerName));// Or use TagResolvers
+// directlymessages.send(player, "balance", Placeholder.parsed("amount", balance));`</pre>
 ///
 /// @see MiniMessage
 /// @see TagResolver
