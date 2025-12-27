@@ -34,7 +34,7 @@ tasks.register<Javadoc>("aggregateJavadoc") {
         this as StandardJavadocDocletOptions
         encoding = "UTF-8"
         charSet = "UTF-8"
-        links("https://docs.oracle.com/en/java/javase/21/docs/api/")
+        links("https://docs.oracle.com/en/java/javase/25/docs/api/")
         links("https://jd.papermc.io/paper/1.21.4/")
         links("https://jd.advntr.dev/api/4.18.0/")
         links("https://javadoc.io/doc/com.zaxxer/HikariCP/6.2.1/")

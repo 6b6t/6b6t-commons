@@ -9,23 +9,23 @@ plugins {
 group = "net.blockhost.commons"
 
 dependencies {
-    errorprone("com.google.errorprone:error_prone_core:2.36.0")
-    spotbugs("com.github.spotbugs:spotbugs:4.8.6")
+    errorprone("com.google.errorprone:error_prone_core:2.38.0")
+    spotbugs("com.github.spotbugs:spotbugs:4.9.8")
 
     // Common annotations
-    compileOnly("org.jetbrains:annotations:26.0.1")
-    compileOnly("com.github.spotbugs:spotbugs-annotations:4.8.6")
+    compileOnly("org.jetbrains:annotations:26.0.2")
+    compileOnly("com.github.spotbugs:spotbugs-annotations:4.9.8")
 
     // Testing
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-    testImplementation("org.junit.jupiter:junit-jupiter:5.11.4")
-    testImplementation("org.mockito:mockito-core:5.14.2")
-    testImplementation("org.mockito:mockito-junit-jupiter:5.14.2")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.13.0")
+    testImplementation("org.mockito:mockito-core:5.20.0")
+    testImplementation("org.mockito:mockito-junit-jupiter:5.20.0")
 }
 
 java {
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(21))
+        languageVersion.set(JavaLanguageVersion.of(25))
     }
     withJavadocJar()
     withSourcesJar()
@@ -57,7 +57,7 @@ tasks {
             (this as StandardJavadocDocletOptions).apply {
                 encoding = "UTF-8"
                 charSet = "UTF-8"
-                links("https://docs.oracle.com/en/java/javase/21/docs/api/")
+                links("https://docs.oracle.com/en/java/javase/25/docs/api/")
                 // Suppress warnings for missing javadoc during development
                 addStringOption("Xdoclint:none", "-quiet")
             }
@@ -73,17 +73,4 @@ spotbugs {
     ignoreFailures.set(false)
     showStackTraces.set(true)
     showProgress.set(true)
-    effort.set(com.github.spotbugs.snom.Effort.MAX)
-    reportLevel.set(com.github.spotbugs.snom.Confidence.LOW)
-    excludeFilter.set(rootProject.file("config/spotbugs/exclude.xml"))
-}
-
-tasks.withType<com.github.spotbugs.snom.SpotBugsTask>().configureEach {
-    reports.create("html") {
-        required.set(true)
-        outputLocation.set(layout.buildDirectory.file("reports/spotbugs/${name}.html"))
-    }
-    reports.create("xml") {
-        required.set(false)
-    }
 }

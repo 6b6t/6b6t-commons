@@ -1,16 +1,16 @@
 [versions]
 # Java
-java = "21"
+java = "25"
 
 # MariaDB
-mariadb = "3.5.3"
-hikaricp = "6.2.1"
+mariadb = "3.5.6"
+hikaricp = "7.0.2"
 
 # ConfigLib
-configlib = "4.5.0"
+configlib = "4.7.0"
 
 # Adventure (MiniMessage)
-adventure = "4.18.0"
+adventure = "4.25.0"
 adventure-platform = "4.3.4"
 
 # Paper API
@@ -20,13 +20,13 @@ paper-api = "1.21.4-R0.1-SNAPSHOT"
 velocity-api = "3.4.0-SNAPSHOT"
 
 # Annotations
-jetbrains-annotations = "26.0.1"
-spotbugs-annotations = "4.8.6"
+jetbrains-annotations = "26.0.2"
+spotbugs-annotations = "4.9.8"
 jspecify = "1.0.0"
 
 # Testing
-junit = "5.11.4"
-mockito = "5.14.2"
+junit = "5.13.0"
+mockito = "5.20.0"
 
 [libraries]
 # Database
