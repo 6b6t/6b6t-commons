@@ -4,6 +4,18 @@ plugins {
     id("io.freefair.lombok")
     id("net.ltgt.errorprone")
     id("com.github.spotbugs")
+    id("org.openrewrite.rewrite")
+}
+
+rewrite {
+    activeRecipe("org.openrewrite.java.format.AutoFormat")
+    activeRecipe("org.openrewrite.staticanalysis.CommonStaticAnalysis")
+    activeRecipe("org.openrewrite.staticanalysis.CodeCleanup")
+    activeRecipe("org.openrewrite.staticanalysis.JavaApiBestPractices")
+    activeRecipe("org.openrewrite.java.testing.junit5.JUnit5BestPractices")
+    activeRecipe("org.openrewrite.java.testing.cleanup.BestPractices")
+    activeRecipe("org.openrewrite.java.migrate.UpgradeToJava25")
+    isExportDatatables = true
 }
 
 group = "net.blockhost.commons"
@@ -11,6 +23,11 @@ group = "net.blockhost.commons"
 dependencies {
     errorprone("com.google.errorprone:error_prone_core:2.38.0")
     spotbugs("com.github.spotbugs:spotbugs:4.9.8")
+
+    // OpenRewrite recipes
+    rewrite("org.openrewrite.recipe:rewrite-static-analysis:2.24.0")
+    rewrite("org.openrewrite.recipe:rewrite-migrate-java:3.24.0")
+    rewrite("org.openrewrite.recipe:rewrite-testing-frameworks:3.3.0")
 
     // Common annotations
     compileOnly("org.jetbrains:annotations:26.0.2")

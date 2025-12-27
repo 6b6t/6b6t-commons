@@ -19,6 +19,7 @@ dependencies {
     implementation("com.github.spotbugs.snom:spotbugs-gradle-plugin:6.4.4")
     implementation("net.ltgt.errorprone:net.ltgt.errorprone.gradle.plugin:4.3.0")
     implementation("io.freefair.gradle:lombok-plugin:8.14.2")
+    implementation("org.openrewrite:plugin:7.23.0")
 }
 
 java {
