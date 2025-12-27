@@ -10,7 +10,7 @@ spotless {
         leadingTabsToSpaces(4)
         endWithNewline()
 
-        palantirJavaFormat("2.82.0")
+        palantirJavaFormat()
 
         importOrder("", "java|javax", "\\#")
     }
