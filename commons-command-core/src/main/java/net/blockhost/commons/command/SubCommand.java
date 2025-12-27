@@ -1,34 +1,53 @@
 package net.blockhost.commons.command;
 
-import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-/// Interface for implementing subcommands in a command hierarchy.
+/// Generic interface for implementing subcommands in a command hierarchy.
 ///
 /// This interface defines the contract for subcommands that can be registered
 /// with a [CommandDispatcher]. Each subcommand has a name, optional aliases,
 /// and handles command execution and tab completion.
 ///
-/// Example implementation:
-/// <pre>
-/// `public class TeleportSubCommand implements SubCommand{void execute(@NotNull Player player, @NotNull String[]
-// args){// Handle teleport command}@NotNull String getName(){return "teleport";}@NotNull String[] getAliases(){return
-// new String[]{"tp", "goto"};}@NotNull List<String> tabComplete(@NotNull Player player, @NotNull String[] args){if
-// (args.length == 2){return getOnlinePlayerNames();}return List.of();}}`</pre>
+/// The type parameter `S` represents the command source type, which varies by platform:
 ///
+/// - For Bukkit/Paper: `Player` or `CommandSender`
+/// - For Velocity: `CommandSource`
+///
+/// Example implementation:
+/// ```java
+/// public class TeleportSubCommand implements SubCommand<Player> {
+///     @Override
+///     public void execute(@NotNull Player player, @NotNull String[] args) {
+///         // Handle teleport command
+///     }
+///
+///     @Override
+///     public @NotNull String getName() {
+///         return "teleport";
+///     }
+///
+///     @Override
+///     public @NotNull String[] getAliases() {
+///         return new String[]{"tp", "goto"};
+///     }
+/// }
+/// ```
+///
+/// @param <S> the command source type (e.g., Player, CommandSender, CommandSource)
 /// @see CommandDispatcher
-public interface SubCommand {
+public interface SubCommand<S> {
 
-    /// Executes the subcommand for the given player.
+    /// Executes the subcommand for the given source.
     ///
     /// The args array includes all arguments passed to the parent command,
     /// starting with the subcommand name at index 0.
     ///
-    /// @param player the player executing the command
+    /// @param source the command source executing the command
     /// @param args   the command arguments (including subcommand name at index 0)
-    void execute(@NotNull Player player, @NotNull String[] args);
+    void execute(@NotNull S source, @NotNull String[] args);
 
     /// Returns the primary name of this subcommand.
     ///
@@ -53,10 +72,10 @@ public interface SubCommand {
     /// Implementations should check the args length to determine which argument
     /// is being completed.
     ///
-    /// @param player the player requesting tab completion
+    /// @param source the command source requesting tab completion
     /// @param args   the current command arguments
     /// @return a list of suggestions, may be empty but never null
-    default @NotNull List<String> tabComplete(@NotNull Player player, @NotNull String[] args) {
+    default @NotNull List<String> tabComplete(@NotNull S source, @NotNull String[] args) {
         return List.of();
     }
 
@@ -65,7 +84,7 @@ public interface SubCommand {
     /// Return null if no specific permission is required.
     ///
     /// @return the permission node, or null if none required
-    default String getPermission() {
+    default @Nullable String getPermission() {
         return null;
     }
 
@@ -83,7 +102,7 @@ public interface SubCommand {
     /// This should show the expected arguments, e.g., `"<player> [message]"`.
     ///
     /// @return the usage syntax
-    default String getUsage() {
+    default @NotNull String getUsage() {
         return "";
     }
 }

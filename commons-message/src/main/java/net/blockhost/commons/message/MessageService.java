@@ -1,5 +1,8 @@
 package net.blockhost.commons.message;
 
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -7,7 +10,6 @@ import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 
 import java.util.Map;
-import java.util.Objects;
 import java.util.function.Function;
 
 /// Service for handling MiniMessage-based message formatting and sending.
@@ -16,23 +18,29 @@ import java.util.function.Function;
 /// applying placeholders, and sending messages to audiences (players, console, etc.).
 ///
 /// Example usage:
-/// <pre>
-/// `// Create a message service with a message providerMessageService messages = MessageService.create(key ->
-// config.getString("messages." + key));// Send a simple messagemessages.send(player, "welcome");// Send a message with
-// placeholdersmessages.send(player, "player-joined", Map.of("player", playerName));// Or use TagResolvers
-// directlymessages.send(player, "balance", Placeholder.parsed("amount", balance));`</pre>
+/// ```java
+/// // Create a message service with a message provider
+/// MessageService messages = MessageService.create(key -> config.getString("messages." + key));
+///
+/// // Send a simple message
+/// messages.send(player, "welcome");
+///
+/// // Send a message with placeholders
+/// messages.send(player, "player-joined", Map.of("player", playerName));
+///
+/// // Or use TagResolvers directly
+/// messages.send(player, "balance", Placeholder.parsed("amount", balance));
+/// ```
 ///
 /// @see MiniMessage
 /// @see TagResolver
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class MessageService {
 
+    @Getter
     private static final MiniMessage MINI_MESSAGE = MiniMessage.miniMessage();
 
     private final Function<String, String> messageProvider;
-
-    private MessageService(Function<String, String> messageProvider) {
-        this.messageProvider = Objects.requireNonNull(messageProvider, "messageProvider");
-    }
 
     /// Creates a new message service with the specified message provider.
     ///
@@ -47,30 +55,16 @@ public final class MessageService {
     }
 
     /// Parses a MiniMessage string into a Component.
-    ///
-    /// @param message the MiniMessage string
-    /// @return the parsed component
     public static Component parse(String message) {
         return MINI_MESSAGE.deserialize(message);
     }
 
     /// Parses a MiniMessage string with tag resolvers.
-    ///
-    /// @param message   the MiniMessage string
-    /// @param resolvers the tag resolvers to apply
-    /// @return the parsed component
     public static Component parse(String message, TagResolver... resolvers) {
         return MINI_MESSAGE.deserialize(message, resolvers);
     }
 
     /// Parses a MiniMessage string with placeholder replacements.
-    ///
-    /// Placeholders should be referenced in the message using angle brackets,
-    /// e.g., `<player>` for a placeholder with key "player".
-    ///
-    /// @param message      the MiniMessage string
-    /// @param placeholders map of placeholder keys to values
-    /// @return the parsed component
     public static Component parse(String message, Map<String, String> placeholders) {
         TagResolver.Builder builder = TagResolver.builder();
         placeholders.forEach((key, value) -> builder.resolver(Placeholder.parsed(key, value)));
@@ -78,9 +72,6 @@ public final class MessageService {
     }
 
     /// Gets a message by key and parses it.
-    ///
-    /// @param key the message key
-    /// @return the parsed component, or an error component if the message is not found
     public Component get(String key) {
         String raw = messageProvider.apply(key);
         if (raw == null) {
@@ -90,10 +81,6 @@ public final class MessageService {
     }
 
     /// Gets a message by key and parses it with tag resolvers.
-    ///
-    /// @param key       the message key
-    /// @param resolvers the tag resolvers to apply
-    /// @return the parsed component
     public Component get(String key, TagResolver... resolvers) {
         String raw = messageProvider.apply(key);
         if (raw == null) {
@@ -103,10 +90,6 @@ public final class MessageService {
     }
 
     /// Gets a message by key and parses it with placeholder replacements.
-    ///
-    /// @param key          the message key
-    /// @param placeholders map of placeholder keys to values
-    /// @return the parsed component
     public Component get(String key, Map<String, String> placeholders) {
         String raw = messageProvider.apply(key);
         if (raw == null) {
@@ -116,77 +99,46 @@ public final class MessageService {
     }
 
     /// Sends a message to an audience.
-    ///
-    /// @param audience the audience to send to
-    /// @param key      the message key
     public void send(Audience audience, String key) {
         audience.sendMessage(get(key));
     }
 
     /// Sends a message to an audience with tag resolvers.
-    ///
-    /// @param audience  the audience to send to
-    /// @param key       the message key
-    /// @param resolvers the tag resolvers to apply
     public void send(Audience audience, String key, TagResolver... resolvers) {
         audience.sendMessage(get(key, resolvers));
     }
 
     /// Sends a message to an audience with placeholder replacements.
-    ///
-    /// @param audience     the audience to send to
-    /// @param key          the message key
-    /// @param placeholders map of placeholder keys to values
     public void send(Audience audience, String key, Map<String, String> placeholders) {
         audience.sendMessage(get(key, placeholders));
     }
 
     /// Sends a raw MiniMessage string to an audience.
-    ///
-    /// @param audience the audience to send to
-    /// @param message  the MiniMessage string
     public void sendRaw(Audience audience, String message) {
         audience.sendMessage(parse(message));
     }
 
     /// Sends a raw MiniMessage string to an audience with tag resolvers.
-    ///
-    /// @param audience  the audience to send to
-    /// @param message   the MiniMessage string
-    /// @param resolvers the tag resolvers to apply
     public void sendRaw(Audience audience, String message, TagResolver... resolvers) {
         audience.sendMessage(parse(message, resolvers));
     }
 
     /// Creates a placeholder resolver for a key-value pair.
-    ///
-    /// @param key   the placeholder key
-    /// @param value the placeholder value
-    /// @return a tag resolver for the placeholder
     public static TagResolver placeholder(String key, String value) {
         return Placeholder.parsed(key, value);
     }
 
     /// Creates a placeholder resolver for a key-component pair.
-    ///
-    /// @param key       the placeholder key
-    /// @param component the component value
-    /// @return a tag resolver for the placeholder
     public static TagResolver placeholder(String key, Component component) {
         return Placeholder.component(key, component);
     }
 
     /// Combines multiple tag resolvers into one.
-    ///
-    /// @param resolvers the resolvers to combine
-    /// @return a combined tag resolver
     public static TagResolver resolvers(TagResolver... resolvers) {
         return TagResolver.resolver(resolvers);
     }
 
     /// Returns the shared MiniMessage instance.
-    ///
-    /// @return the MiniMessage instance
     public static MiniMessage miniMessage() {
         return MINI_MESSAGE;
     }

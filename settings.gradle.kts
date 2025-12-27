@@ -13,8 +13,10 @@ plugins {
 
 rootProject.name = "server-commons"
 
+include("commons-core")
 include("commons-database")
 include("commons-config")
 include("commons-message")
-include("commons-command")
-include("commons-core")
+include("commons-command-core")
+include("commons-command-bukkit")
+include("commons-command-velocity")

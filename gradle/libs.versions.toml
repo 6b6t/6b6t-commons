@@ -36,6 +36,7 @@ hikaricp = { module = "com.zaxxer:HikariCP", version.ref = "hikaricp" }
 # ConfigLib
 configlib-yaml = { module = "de.exlll:configlib-yaml", version.ref = "configlib" }
 configlib-paper = { module = "de.exlll:configlib-paper", version.ref = "configlib" }
+configlib-velocity = { module = "de.exlll:configlib-velocity", version.ref = "configlib" }
 
 # Adventure
 adventure-api = { module = "net.kyori:adventure-api", version.ref = "adventure" }

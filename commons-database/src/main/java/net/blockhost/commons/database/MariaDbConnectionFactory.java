@@ -1,5 +1,7 @@
 package net.blockhost.commons.database;
 
+import lombok.experimental.UtilityClass;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -14,59 +16,48 @@ import java.util.Properties;
 /// property configuration, and timeout settings.
 ///
 /// Example usage:
-/// <pre>
-/// `DatabaseCredentials credentials =
-// DatabaseCredentials.builder().host("localhost").database("mydb").username("user").password("pass").build();try
-// (Connection connection = MariaDbConnectionFactory.openConnection(credentials)){// Use the connection}`</pre>
+/// ```java
+/// DatabaseCredentials credentials = DatabaseCredentials.builder()
+///     .host("localhost")
+///     .database("mydb")
+///     .username("user")
+///     .password("pass")
+///     .build();
+///
+/// try (Connection connection = MariaDbConnectionFactory.openConnection(credentials)) {
+///     // Use the connection
+/// }
+/// ```
 ///
 /// For connection pooling, consider using [HikariDataSourceBuilder] instead.
 ///
 /// @see DatabaseCredentials
 /// @see HikariDataSourceBuilder
-public final class MariaDbConnectionFactory {
+@UtilityClass
+public class MariaDbConnectionFactory {
 
     private static final String DRIVER_CLASS = "org.mariadb.jdbc.Driver";
-
-    private MariaDbConnectionFactory() {
-        // Utility class
-    }
 
     /// Opens a new database connection using the provided credentials.
     ///
     /// The connection will have timeout settings applied based on the credentials.
-    ///
-    /// @param credentials the database credentials
-    /// @return a new database connection
-    /// @throws SQLException if a database access error occurs or the driver is not available
-    public static Connection openConnection(DatabaseCredentials credentials) throws SQLException {
+    public Connection openConnection(DatabaseCredentials credentials) throws SQLException {
         return openConnection(credentials, true);
     }
 
     /// Opens a new database connection with optional timeout settings.
-    ///
-    /// @param credentials  the database credentials
-    /// @param applyTimeout whether to apply timeout settings from the credentials
-    /// @return a new database connection
-    /// @throws SQLException if a database access error occurs or the driver is not available
-    public static Connection openConnection(DatabaseCredentials credentials, boolean applyTimeout) throws SQLException {
+    public Connection openConnection(DatabaseCredentials credentials, boolean applyTimeout) throws SQLException {
         ensureDriverLoaded();
         return DriverManager.getConnection(credentials.jdbcUrl(), buildConnectionProperties(credentials, applyTimeout));
     }
 
     /// Builds connection properties from the provided credentials.
-    ///
-    /// @param credentials the database credentials
-    /// @return a Properties object containing all connection properties
-    public static Properties buildConnectionProperties(DatabaseCredentials credentials) {
+    public Properties buildConnectionProperties(DatabaseCredentials credentials) {
         return buildConnectionProperties(credentials, true);
     }
 
     /// Builds connection properties with optional timeout settings.
-    ///
-    /// @param credentials  the database credentials
-    /// @param applyTimeout whether to include timeout settings
-    /// @return a Properties object containing connection properties
-    public static Properties buildConnectionProperties(DatabaseCredentials credentials, boolean applyTimeout) {
+    public Properties buildConnectionProperties(DatabaseCredentials credentials, boolean applyTimeout) {
         Properties properties = new Properties();
         properties.setProperty("user", credentials.username());
         properties.setProperty("password", credentials.password());
@@ -90,9 +81,7 @@ public final class MariaDbConnectionFactory {
     }
 
     /// Ensures the MariaDB JDBC driver is loaded.
-    ///
-    /// @throws SQLException if the driver class cannot be found
-    public static void ensureDriverLoaded() throws SQLException {
+    public void ensureDriverLoaded() throws SQLException {
         try {
             Class.forName(DRIVER_CLASS, true, MariaDbConnectionFactory.class.getClassLoader());
         } catch (ClassNotFoundException e) {
@@ -104,10 +93,7 @@ public final class MariaDbConnectionFactory {
     ///
     /// This method attempts to open a connection, validates it, and then closes it.
     /// It's useful for verifying database connectivity during application startup.
-    ///
-    /// @param credentials the database credentials to validate
-    /// @throws SQLException if the connection cannot be established or is invalid
-    public static void validateConnection(DatabaseCredentials credentials) throws SQLException {
+    public void validateConnection(DatabaseCredentials credentials) throws SQLException {
         ensureDriverLoaded();
 
         Duration timeout = credentials.connectionTimeout();

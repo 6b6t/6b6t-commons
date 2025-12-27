@@ -1,5 +1,7 @@
 package net.blockhost.commons.core;
 
+import lombok.experimental.UtilityClass;
+
 import java.time.Duration;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
@@ -10,24 +12,24 @@ import java.util.concurrent.TimeUnit;
 /// suitable for display to users, such as countdown timers, cooldown displays, etc.
 ///
 /// Example usage:
-/// <pre>
-/// `// Format secondsTimeFormatter.formatSeconds(3661); // "1h 1m 1s"// Format
-// durationTimeFormatter.format(Duration.ofMinutes(90)); // "1h 30m"// Compact
-// formatTimeFormatter.formatCompact(Duration.ofSeconds(125)); // "2:05"`</pre>
-public final class TimeFormatter {
-
-    private TimeFormatter() {
-        // Utility class
-    }
+/// ```java
+/// // Format seconds
+/// TimeFormatter.formatSeconds(3661); // "1h 1m 1s"
+///
+/// // Format duration
+/// TimeFormatter.format(Duration.ofMinutes(90)); // "1h 30m"
+///
+/// // Compact format
+/// TimeFormatter.formatCompact(Duration.ofSeconds(125)); // "2:05"
+/// ```
+@UtilityClass
+public class TimeFormatter {
 
     /// Formats a duration in seconds into a human-readable string.
     ///
     /// Format: "Xh Xm Xs" (e.g., "1h 30m 45s")
     /// Only non-zero units are included.
-    ///
-    /// @param totalSeconds the duration in seconds
-    /// @return the formatted string
-    public static String formatSeconds(long totalSeconds) {
+    public String formatSeconds(long totalSeconds) {
         if (totalSeconds <= 0) {
             return "0s";
         }
@@ -51,32 +53,21 @@ public final class TimeFormatter {
     }
 
     /// Formats a Duration into a human-readable string.
-    ///
-    /// @param duration the duration to format
-    /// @return the formatted string
-    public static String format(Duration duration) {
+    public String format(Duration duration) {
         return formatSeconds(duration.toSeconds());
     }
 
     /// Formats a duration in milliseconds into a human-readable string.
-    ///
-    /// @param millis the duration in milliseconds
-    /// @return the formatted string
-    public static String formatMillis(long millis) {
+    public String formatMillis(long millis) {
         return formatSeconds(TimeUnit.MILLISECONDS.toSeconds(millis));
     }
 
     /// Formats a duration in seconds into a compact MM:SS or HH:MM:SS format.
     ///
     /// Examples:
-    ///
-    ///     - 65 seconds -&gt; "1:05"
-    ///     - 3661 seconds -&gt; "1:01:01"
-    ///
-    ///
-    /// @param totalSeconds the duration in seconds
-    /// @return the formatted string
-    public static String formatCompact(long totalSeconds) {
+    /// - 65 seconds -> "1:05"
+    /// - 3661 seconds -> "1:01:01"
+    public String formatCompact(long totalSeconds) {
         if (totalSeconds < 0) {
             return "0:00";
         }
@@ -93,20 +84,14 @@ public final class TimeFormatter {
     }
 
     /// Formats a Duration into a compact MM:SS or HH:MM:SS format.
-    ///
-    /// @param duration the duration to format
-    /// @return the formatted string
-    public static String formatCompact(Duration duration) {
+    public String formatCompact(Duration duration) {
         return formatCompact(duration.toSeconds());
     }
 
     /// Formats a duration with full unit names.
     ///
     /// Format: "X hours, X minutes, X seconds" (e.g., "1 hour, 30 minutes, 45 seconds")
-    ///
-    /// @param totalSeconds the duration in seconds
-    /// @return the formatted string
-    public static String formatLong(long totalSeconds) {
+    public String formatLong(long totalSeconds) {
         if (totalSeconds <= 0) {
             return "0 seconds";
         }
@@ -137,28 +122,19 @@ public final class TimeFormatter {
     }
 
     /// Formats a Duration with full unit names.
-    ///
-    /// @param duration the duration to format
-    /// @return the formatted string
-    public static String formatLong(Duration duration) {
+    public String formatLong(Duration duration) {
         return formatLong(duration.toSeconds());
     }
 
     /// Parses a time string into seconds.
     ///
     /// Supported formats:
-    ///
-    ///     - "30" or "30s" - 30 seconds
-    ///     - "5m" - 5 minutes (300 seconds)
-    ///     - "2h" - 2 hours (7200 seconds)
-    ///     - "1d" - 1 day (86400 seconds)
-    ///     - "1h30m" - 1 hour 30 minutes
-    ///
-    ///
-    /// @param input the time string to parse
-    /// @return the duration in seconds
-    /// @throws IllegalArgumentException if the input cannot be parsed
-    public static long parseToSeconds(String input) {
+    /// - "30" or "30s" - 30 seconds
+    /// - "5m" - 5 minutes (300 seconds)
+    /// - "2h" - 2 hours (7200 seconds)
+    /// - "1d" - 1 day (86400 seconds)
+    /// - "1h30m" - 1 hour 30 minutes
+    public long parseToSeconds(String input) {
         if (input == null || input.isBlank()) {
             throw new IllegalArgumentException("Input cannot be null or blank");
         }
@@ -198,12 +174,7 @@ public final class TimeFormatter {
     }
 
     /// Parses a time string into a Duration.
-    ///
-    /// @param input the time string to parse
-    /// @return the parsed Duration
-    /// @throws IllegalArgumentException if the input cannot be parsed
-    /// @see #parseToSeconds(String)
-    public static Duration parse(String input) {
+    public Duration parse(String input) {
         return Duration.ofSeconds(parseToSeconds(input));
     }
 }

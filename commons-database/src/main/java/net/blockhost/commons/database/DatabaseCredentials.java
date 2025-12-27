@@ -1,5 +1,7 @@
 package net.blockhost.commons.database;
 
+import lombok.Getter;
+import lombok.experimental.Accessors;
 import org.jetbrains.annotations.Nullable;
 
 import java.time.Duration;
@@ -15,12 +17,20 @@ import java.util.Objects;
 /// connection properties.
 ///
 /// Use the [Builder] to create instances:
-/// <pre>
-/// `DatabaseCredentials credentials =
-// DatabaseCredentials.builder().host("localhost").port(3306).database("mydb").username("user").password("pass").build();`</pre>
+/// ```java
+/// DatabaseCredentials credentials = DatabaseCredentials.builder()
+///     .host("localhost")
+///     .port(3306)
+///     .database("mydb")
+///     .username("user")
+///     .password("pass")
+///     .build();
+/// ```
 ///
 /// @see MariaDbConnectionFactory
 /// @see HikariDataSourceBuilder
+@Getter
+@Accessors(fluent = true)
 public final class DatabaseCredentials {
 
     private final String host;
@@ -48,55 +58,6 @@ public final class DatabaseCredentials {
         return new Builder();
     }
 
-    /// Returns the database host address.
-    ///
-    /// @return the host address
-    public String host() {
-        return host;
-    }
-
-    /// Returns the database port.
-    ///
-    /// @return the port number
-    public int port() {
-        return port;
-    }
-
-    /// Returns the database name.
-    ///
-    /// @return the database name
-    public String database() {
-        return database;
-    }
-
-    /// Returns the username for authentication.
-    ///
-    /// @return the username
-    public String username() {
-        return username;
-    }
-
-    /// Returns the password for authentication.
-    ///
-    /// @return the password, never null but may be empty
-    public String password() {
-        return password;
-    }
-
-    /// Returns the connection timeout duration.
-    ///
-    /// @return the connection timeout
-    public Duration connectionTimeout() {
-        return connectionTimeout;
-    }
-
-    /// Returns additional connection properties.
-    ///
-    /// @return an unmodifiable map of additional properties
-    public Map<String, String> properties() {
-        return properties;
-    }
-
     /// Constructs the JDBC URL for MariaDB connections.
     ///
     /// @return the JDBC URL string
@@ -106,6 +67,7 @@ public final class DatabaseCredentials {
 
     /// Builder for creating [DatabaseCredentials] instances.
     public static final class Builder {
+
         private String host;
         private int port = 3306;
         private String database;
@@ -117,19 +79,12 @@ public final class DatabaseCredentials {
         private Builder() {}
 
         /// Sets the database host address.
-        ///
-        /// @param host the host address
-        /// @return this builder
         public Builder host(String host) {
             this.host = Objects.requireNonNull(host, "host").trim();
             return this;
         }
 
         /// Sets the database port.
-        ///
-        /// @param port the port number (must be positive)
-        /// @return this builder
-        /// @throws IllegalArgumentException if port is not positive
         public Builder port(int port) {
             if (port <= 0) {
                 throw new IllegalArgumentException("Port must be positive: " + port);
@@ -139,37 +94,24 @@ public final class DatabaseCredentials {
         }
 
         /// Sets the database name.
-        ///
-        /// @param database the database name
-        /// @return this builder
         public Builder database(String database) {
             this.database = Objects.requireNonNull(database, "database").trim();
             return this;
         }
 
         /// Sets the username for authentication.
-        ///
-        /// @param username the username
-        /// @return this builder
         public Builder username(String username) {
             this.username = Objects.requireNonNull(username, "username").trim();
             return this;
         }
 
         /// Sets the password for authentication.
-        ///
-        /// @param password the password, may be null
-        /// @return this builder
         public Builder password(@Nullable String password) {
             this.password = password;
             return this;
         }
 
         /// Sets the connection timeout duration.
-        ///
-        /// @param timeout the timeout duration (must be positive)
-        /// @return this builder
-        /// @throws IllegalArgumentException if timeout is negative or zero
         public Builder connectionTimeout(Duration timeout) {
             Objects.requireNonNull(timeout, "timeout");
             if (timeout.isNegative() || timeout.isZero()) {
@@ -180,27 +122,17 @@ public final class DatabaseCredentials {
         }
 
         /// Sets the connection timeout in seconds.
-        ///
-        /// @param seconds the timeout in seconds (must be positive)
-        /// @return this builder
         public Builder connectionTimeoutSeconds(int seconds) {
             return connectionTimeout(Duration.ofSeconds(seconds));
         }
 
         /// Adds an additional connection property.
-        ///
-        /// @param key   the property key
-        /// @param value the property value
-        /// @return this builder
         public Builder property(String key, String value) {
             this.properties.put(Objects.requireNonNull(key, "key"), Objects.requireNonNull(value, "value"));
             return this;
         }
 
         /// Adds multiple connection properties.
-        ///
-        /// @param properties the properties to add
-        /// @return this builder
         public Builder properties(Map<String, String> properties) {
             Objects.requireNonNull(properties, "properties");
             this.properties.putAll(properties);
@@ -208,9 +140,6 @@ public final class DatabaseCredentials {
         }
 
         /// Builds the [DatabaseCredentials] instance.
-        ///
-        /// @return a new DatabaseCredentials instance
-        /// @throws NullPointerException if required fields are not set
         public DatabaseCredentials build() {
             return new DatabaseCredentials(this);
         }
