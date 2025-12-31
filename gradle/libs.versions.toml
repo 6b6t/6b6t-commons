@@ -9,6 +9,9 @@ hikaricp = "7.0.2"
 # ConfigLib
 configlib = "4.7.0"
 
+# SnakeYAML
+snakeyaml = "2.4"
+
 # Adventure (MiniMessage)
 adventure = "4.25.0"
 adventure-platform = "4.3.4"
@@ -37,6 +40,9 @@ hikaricp = { module = "com.zaxxer:HikariCP", version.ref = "hikaricp" }
 configlib-yaml = { module = "de.exlll:configlib-yaml", version.ref = "configlib" }
 configlib-paper = { module = "de.exlll:configlib-paper", version.ref = "configlib" }
 configlib-velocity = { module = "de.exlll:configlib-velocity", version.ref = "configlib" }
+
+# SnakeYAML
+snakeyaml = { module = "org.yaml:snakeyaml", version.ref = "snakeyaml" }
 
 # Adventure
 adventure-api = { module = "net.kyori:adventure-api", version.ref = "adventure" }

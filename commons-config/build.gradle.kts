@@ -7,6 +7,7 @@ description = "Configuration utilities for 6b6t plugins - ConfigLib integration"
 
 dependencies {
     api(libs.configlib.yaml)
+    api(libs.snakeyaml)
 
     compileOnly(libs.jetbrains.annotations)
     compileOnly(libs.spotbugs.annotations)
