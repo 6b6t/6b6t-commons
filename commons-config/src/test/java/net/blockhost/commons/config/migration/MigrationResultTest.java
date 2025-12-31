@@ -47,8 +47,8 @@ class MigrationResultTest {
     @Test
     void failure_createsFailedResult() {
         Map<String, Object> data = Map.of("version", 2);
-        List<MigrationResult.MigrationStep> stepsCompleted = List.of(
-                new MigrationResult.MigrationStep(1, 2, "M2", Duration.ofMillis(10)));
+        List<MigrationResult.MigrationStep> stepsCompleted =
+                List.of(new MigrationResult.MigrationStep(1, 2, "M2", Duration.ofMillis(10)));
         MigrationException error = new MigrationException("Test failure");
 
         MigrationResult result = MigrationResult.failure(1, 3, stepsCompleted, Duration.ofMillis(20), data, error);
@@ -135,8 +135,8 @@ class MigrationResultTest {
     @Test
     void steps_areImmutable() {
         Map<String, Object> data = Map.of("version", 2);
-        List<MigrationResult.MigrationStep> steps = List.of(
-                new MigrationResult.MigrationStep(1, 2, "M2", Duration.ofMillis(10)));
+        List<MigrationResult.MigrationStep> steps =
+                List.of(new MigrationResult.MigrationStep(1, 2, "M2", Duration.ofMillis(10)));
 
         MigrationResult result = MigrationResult.success(1, 2, steps, Duration.ofMillis(10), data);
 
@@ -147,8 +147,7 @@ class MigrationResultTest {
 
     @Test
     void successRecord_implementsInterface() {
-        MigrationResult.Success success = new MigrationResult.Success(
-                1, 2, List.of(), Duration.ZERO, Map.of());
+        MigrationResult.Success success = new MigrationResult.Success(1, 2, List.of(), Duration.ZERO, Map.of());
 
         assertTrue(success.isSuccess());
         assertTrue(success.error().isEmpty());
@@ -159,8 +158,7 @@ class MigrationResultTest {
     @Test
     void failureRecord_implementsInterface() {
         MigrationException error = new MigrationException("Test");
-        MigrationResult.Failure failure = new MigrationResult.Failure(
-                1, 2, List.of(), Duration.ZERO, Map.of(), error);
+        MigrationResult.Failure failure = new MigrationResult.Failure(1, 2, List.of(), Duration.ZERO, Map.of(), error);
 
         assertFalse(failure.isSuccess());
         assertTrue(failure.error().isPresent());
@@ -169,8 +167,8 @@ class MigrationResultTest {
 
     @Test
     void migrationStep_recordComponents() {
-        MigrationResult.MigrationStep step = new MigrationResult.MigrationStep(
-                1, 2, "Test step", Duration.ofMillis(100));
+        MigrationResult.MigrationStep step =
+                new MigrationResult.MigrationStep(1, 2, "Test step", Duration.ofMillis(100));
 
         assertEquals(1, step.fromVersion());
         assertEquals(2, step.toVersion());

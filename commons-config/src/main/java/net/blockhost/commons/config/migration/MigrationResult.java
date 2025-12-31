@@ -4,7 +4,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -99,15 +98,11 @@ public sealed interface MigrationResult {
     /// @param data the migrated data
     /// @return a successful result
     static MigrationResult success(
-            int fromVersion,
-            int toVersion,
-            List<MigrationStep> steps,
-            Duration duration,
-            Map<String, Object> data) {
+            int fromVersion, int toVersion, List<MigrationStep> steps, Duration duration, Map<String, Object> data) {
         Objects.requireNonNull(steps, "steps");
         Objects.requireNonNull(duration, "duration");
         Objects.requireNonNull(data, "data");
-        return new Success(fromVersion, toVersion, List.copyOf(steps), duration, data);
+        return new Success(fromVersion, toVersion, List.copyOf(steps), duration, Map.copyOf(data));
     }
 
     /// Creates a result indicating no migration was needed.
@@ -117,7 +112,7 @@ public sealed interface MigrationResult {
     /// @return a success result with no steps
     static MigrationResult noMigrationNeeded(int version, Map<String, Object> data) {
         Objects.requireNonNull(data, "data");
-        return new Success(version, version, List.of(), Duration.ZERO, data);
+        return new Success(version, version, List.of(), Duration.ZERO, Map.copyOf(data));
     }
 
     /// Creates a failed migration result.
@@ -140,16 +135,14 @@ public sealed interface MigrationResult {
         Objects.requireNonNull(duration, "duration");
         Objects.requireNonNull(data, "data");
         Objects.requireNonNull(error, "error");
-        return new Failure(fromVersion, failedAtVersion, List.copyOf(stepsCompleted), duration, data, error);
+        return new Failure(
+                fromVersion, failedAtVersion, List.copyOf(stepsCompleted), duration, Map.copyOf(data), error);
     }
 
     /// Represents a successful migration result.
     record Success(
-            int fromVersion,
-            int toVersion,
-            List<MigrationStep> steps,
-            Duration duration,
-            Map<String, Object> data) implements MigrationResult {
+            int fromVersion, int toVersion, List<MigrationStep> steps, Duration duration, Map<String, Object> data)
+            implements MigrationResult {
 
         @Override
         public boolean isSuccess() {
@@ -169,7 +162,8 @@ public sealed interface MigrationResult {
             List<MigrationStep> steps,
             Duration duration,
             Map<String, Object> data,
-            MigrationException cause) implements MigrationResult {
+            MigrationException cause)
+            implements MigrationResult {
 
         @Override
         public boolean isSuccess() {
@@ -271,7 +265,8 @@ public sealed interface MigrationResult {
         /// @return the failed result
         public MigrationResult fail(int failedAtVersion, MigrationException cause) {
             Objects.requireNonNull(cause, "cause");
-            return failure(fromVersion, failedAtVersion, steps, Duration.between(startTime, Instant.now()), data, cause);
+            return failure(
+                    fromVersion, failedAtVersion, steps, Duration.between(startTime, Instant.now()), data, cause);
         }
 
         /// Builds a result indicating no migration was needed.

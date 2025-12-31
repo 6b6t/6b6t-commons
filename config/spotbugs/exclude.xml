@@ -26,4 +26,40 @@
         <Class name="~.*Config"/>
         <Bug pattern="EI_EXPOSE_REP"/>
     </Match>
+
+    <!--
+        Migration package: Internal representation exposure is intentional by design:
+        - MigrationContext.data() must be mutable so migrations can modify it
+        - MigrationResult records use immutable copies from factory methods
+        - MigrationExecutor and ConfigMigrator expose their registry for inspection
+    -->
+    <Match>
+        <Class name="net.blockhost.commons.config.migration.MigrationContext"/>
+        <Or>
+            <Bug pattern="EI_EXPOSE_REP"/>
+            <Bug pattern="EI_EXPOSE_REP2"/>
+        </Or>
+    </Match>
+    <Match>
+        <Class name="net.blockhost.commons.config.migration.MigrationExecutor"/>
+        <Or>
+            <Bug pattern="EI_EXPOSE_REP"/>
+            <Bug pattern="EI_EXPOSE_REP2"/>
+        </Or>
+    </Match>
+    <Match>
+        <Class name="net.blockhost.commons.config.migration.ConfigMigrator"/>
+        <Or>
+            <Bug pattern="EI_EXPOSE_REP"/>
+            <Bug pattern="EI_EXPOSE_REP2"/>
+        </Or>
+    </Match>
+    <!-- Use regex for inner classes -->
+    <Match>
+        <Class name="~net\.blockhost\.commons\.config\.migration\.MigrationResult\$.*"/>
+        <Or>
+            <Bug pattern="EI_EXPOSE_REP"/>
+            <Bug pattern="EI_EXPOSE_REP2"/>
+        </Or>
+    </Match>
 </FindBugsFilter>

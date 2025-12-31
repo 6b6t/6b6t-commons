@@ -100,8 +100,7 @@ import java.util.function.Consumer;
 /// @see MigrationResult
 public final class ConfigMigrator {
 
-    private static final DateTimeFormatter BACKUP_TIMESTAMP_FORMAT =
-            DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss");
+    private static final DateTimeFormatter BACKUP_TIMESTAMP_FORMAT = DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss");
 
     private final MigrationRegistry registry;
     private final MigrationExecutor executor;
@@ -152,8 +151,7 @@ public final class ConfigMigrator {
     /// @return the loaded and migrated configuration
     /// @throws MigrationException if migration or loading fails
     /// @throws NullPointerException if any parameter is null
-    public <T extends VersionAwareConfiguration> T migrateAndLoad(
-            Path path, Class<T> configClass, int targetVersion) {
+    public <T extends VersionAwareConfiguration> T migrateAndLoad(Path path, Class<T> configClass, int targetVersion) {
         Objects.requireNonNull(path, "path");
         Objects.requireNonNull(configClass, "configClass");
 
@@ -310,22 +308,31 @@ public final class ConfigMigrator {
 
     private void createBackup(Path path) {
         try {
+            Path fileNamePath = path.getFileName();
+            if (fileNamePath == null) {
+                throw new MigrationException("Cannot create backup: path has no file name: " + path);
+            }
+            String fileName = fileNamePath.toString();
+
             String backupName;
             if (useTimestampedBackups) {
-                String timestamp = LocalDateTime.now().format(BACKUP_TIMESTAMP_FORMAT);
-                String fileName = path.getFileName().toString();
+                String timestamp =
+                        LocalDateTime.now(java.time.ZoneId.systemDefault()).format(BACKUP_TIMESTAMP_FORMAT);
                 int dotIndex = fileName.lastIndexOf('.');
                 if (dotIndex > 0) {
-                    backupName = fileName.substring(0, dotIndex) + "-" + timestamp + fileName.substring(dotIndex) + backupSuffix;
+                    backupName = fileName.substring(0, dotIndex) + "-" + timestamp + fileName.substring(dotIndex)
+                            + backupSuffix;
                 } else {
                     backupName = fileName + "-" + timestamp + backupSuffix;
                 }
             } else {
-                backupName = path.getFileName().toString() + backupSuffix;
+                backupName = fileName + backupSuffix;
             }
 
             Path backupPath = path.resolveSibling(backupName);
             Files.copy(path, backupPath, StandardCopyOption.REPLACE_EXISTING);
+        } catch (MigrationException e) {
+            throw e;
         } catch (Exception e) {
             throw new MigrationException("Failed to create backup of " + path, e);
         }

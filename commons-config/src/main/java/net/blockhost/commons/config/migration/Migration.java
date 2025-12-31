@@ -76,7 +76,6 @@ package net.blockhost.commons.config.migration;
 /// @see MigrationContext
 /// @see MigrationRegistry
 /// @see MigrationExecutor
-@FunctionalInterface
 public interface Migration {
 
     /// Returns the version this migration upgrades from.

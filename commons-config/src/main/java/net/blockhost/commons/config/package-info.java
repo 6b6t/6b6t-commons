@@ -8,7 +8,8 @@
 ///
 /// - **Simple loading**: Load and save configs with [ConfigLoader]
 /// - **Version tracking**: Extend [VersionAwareConfiguration] for versioned configs
-/// - **Migration support**: Full migration framework in the [migration][net.blockhost.commons.config.migration] subpackage
+/// - **Migration support**: Full migration framework in the [migration][net.blockhost.commons.config.migration]
+// subpackage
 ///
 /// ## Quick Start
 ///

@@ -221,7 +221,8 @@ public final class MigrationContext {
         if (value instanceof Map<?, ?> map) {
             return (Map<String, Object>) map;
         }
-        throw new MigrationException("Expected map at key '%s', but found: %s".formatted(key, value.getClass().getName()));
+        throw new MigrationException("Expected map at key '%s', but found: %s"
+                .formatted(key, value.getClass().getName()));
     }
 
     /// Gets a value from a nested map.
@@ -264,13 +265,15 @@ public final class MigrationContext {
     /// @param newKey the new key name within the nested map
     /// @return true if the key was renamed, false otherwise
     public boolean renameNested(String mapKey, String oldKey, String newKey) {
-        return getNestedMap(mapKey).map(map -> {
-            if (!map.containsKey(oldKey)) {
-                return false;
-            }
-            map.put(newKey, map.remove(oldKey));
-            return true;
-        }).orElse(false);
+        return getNestedMap(mapKey)
+                .map(map -> {
+                    if (!map.containsKey(oldKey)) {
+                        return false;
+                    }
+                    map.put(newKey, map.remove(oldKey));
+                    return true;
+                })
+                .orElse(false);
     }
 
     /// Sets a value in the data map if the key is not already present.

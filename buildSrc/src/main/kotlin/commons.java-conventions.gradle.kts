@@ -90,4 +90,5 @@ spotbugs {
     ignoreFailures.set(false)
     showStackTraces.set(true)
     showProgress.set(true)
+    excludeFilter.set(rootProject.file("config/spotbugs/exclude.xml"))
 }

@@ -59,7 +59,7 @@ import java.util.Objects;
 public class RawYamlLoader {
 
     private static final int DEFAULT_INDENT = 2;
-    private static final int DEFAULT_INDICATOR_INDENT = 2;
+    private static final int DEFAULT_INDICATOR_INDENT = 0;
 
     /// Loads YAML content from a file path.
     ///
@@ -270,7 +270,8 @@ public class RawYamlLoader {
             }
         }
 
-        throw new MigrationException("Version field must be a number, got: " + versionObj.getClass().getName());
+        throw new MigrationException(
+                "Version field must be a number, got: " + versionObj.getClass().getName());
     }
 
     /// Creates a new Yaml instance with default configuration.

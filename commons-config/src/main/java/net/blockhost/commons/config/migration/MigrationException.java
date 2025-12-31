@@ -89,8 +89,7 @@ public class MigrationException extends RuntimeException {
     /// @param toVersion the target version
     /// @return a new MigrationException with a descriptive message
     public static MigrationException missingMigration(int fromVersion, int toVersion) {
-        return new MigrationException(
-                "No migration registered for version %d to %d".formatted(fromVersion, toVersion));
+        return new MigrationException("No migration registered for version %d to %d".formatted(fromVersion, toVersion));
     }
 
     /// Creates a migration exception indicating an invalid version range.
@@ -99,8 +98,8 @@ public class MigrationException extends RuntimeException {
     /// @param toVersion the target version
     /// @return a new MigrationException with a descriptive message
     public static MigrationException invalidVersionRange(int fromVersion, int toVersion) {
-        return new MigrationException(
-                "Invalid version range: cannot migrate from version %d to version %d".formatted(fromVersion, toVersion));
+        return new MigrationException("Invalid version range: cannot migrate from version %d to version %d"
+                .formatted(fromVersion, toVersion));
     }
 
     /// Creates a migration exception indicating a migration failure at a specific version.

@@ -229,9 +229,7 @@ class MigrationRegistryTest {
     @Test
     void registerAll_addsMultipleMigrations() {
         registry.registerAll(
-                Migration.of(2, "M2", ctx -> {}),
-                Migration.of(3, "M3", ctx -> {}),
-                Migration.of(4, "M4", ctx -> {}));
+                Migration.of(2, "M2", ctx -> {}), Migration.of(3, "M3", ctx -> {}), Migration.of(4, "M4", ctx -> {}));
 
         assertEquals(3, registry.size());
     }

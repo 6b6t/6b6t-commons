@@ -67,8 +67,9 @@ class MigrationTest {
     }
 
     @Test
-    void functionalInterface_worksWithLambda() {
-        Migration migration = context -> context.data().put("test", true);
+    void factoryMethod_worksWithLambda() {
+        Migration migration =
+                Migration.of(1, "Test migration", ctx -> ctx.data().put("test", true));
 
         // Default implementations should work
         assertEquals(0, migration.sourceVersion());
