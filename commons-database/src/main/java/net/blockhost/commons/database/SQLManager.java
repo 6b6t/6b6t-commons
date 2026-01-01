@@ -89,10 +89,16 @@ public final class SQLManager {
         this.config = Objects.requireNonNull(builder.config, "config");
         this.poolName = builder.poolName;
         this.logger = builder.logger;
-        this.infoLogger = builder.infoLogger != null ? builder.infoLogger :
-                msg -> { if (logger != null) logger.info(msg); };
-        this.warningLogger = builder.warningLogger != null ? builder.warningLogger :
-                msg -> { if (logger != null) logger.warning(msg); };
+        this.infoLogger = builder.infoLogger != null
+                ? builder.infoLogger
+                : msg -> {
+                    if (logger != null) logger.info(msg);
+                };
+        this.warningLogger = builder.warningLogger != null
+                ? builder.warningLogger
+                : msg -> {
+                    if (logger != null) logger.warning(msg);
+                };
     }
 
     /// Creates a new builder for SQLManager.
@@ -304,21 +310,6 @@ public final class SQLManager {
         }
     }
 
-    /// Gets the underlying HikariDataSource.
-    ///
-    /// **Warning**: Direct access to the data source should be used sparingly.
-    /// Prefer using [#getConnection()] or [#withConnection(ConnectionConsumer)].
-    ///
-    /// @return the HikariDataSource, or null if not connected
-    public @Nullable HikariDataSource getDataSource() {
-        lock.readLock().lock();
-        try {
-            return dataSource;
-        } finally {
-            lock.readLock().unlock();
-        }
-    }
-
     /// Gets the current database configuration.
     ///
     /// @return the current configuration
@@ -339,7 +330,7 @@ public final class SQLManager {
         }
 
         try (Connection conn = dataSource.getConnection();
-             Statement stmt = conn.createStatement()) {
+                Statement stmt = conn.createStatement()) {
 
             for (String sql : tableStatements) {
                 stmt.executeUpdate(sql);
@@ -358,7 +349,7 @@ public final class SQLManager {
         }
 
         try (Connection conn = dataSource.getConnection();
-             Statement stmt = conn.createStatement()) {
+                Statement stmt = conn.createStatement()) {
 
             // Create migrations tracking table
             stmt.executeUpdate("""
@@ -389,8 +380,8 @@ public final class SQLManager {
 
                 stmt.executeUpdate(migration.sql());
 
-                try (var insertStmt = conn.prepareStatement(
-                        "INSERT INTO _migrations (version, description) VALUES (?, ?)")) {
+                try (var insertStmt =
+                        conn.prepareStatement("INSERT INTO _migrations (version, description) VALUES (?, ?)")) {
                     insertStmt.setInt(1, migration.version());
                     insertStmt.setString(2, migration.description());
                     insertStmt.executeUpdate();

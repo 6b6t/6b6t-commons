@@ -123,7 +123,8 @@ public abstract class ConfigurationHolder<T> {
     /// @throws IllegalStateException if path or configClass was not set during construction
     public void save() {
         if (configPath == null || configClass == null) {
-            throw new IllegalStateException("Cannot save: path or configClass not set. Use save(path, configClass) instead.");
+            throw new IllegalStateException(
+                    "Cannot save: path or configClass not set. Use save(path, configClass) instead.");
         }
         ConfigLoader.save(configPath, configClass, configRef.get());
     }

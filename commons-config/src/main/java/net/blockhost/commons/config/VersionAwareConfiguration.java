@@ -4,6 +4,9 @@ import de.exlll.configlib.Comment;
 import de.exlll.configlib.Configuration;
 import lombok.Getter;
 import lombok.experimental.Accessors;
+import net.blockhost.commons.config.migration.ConfigMigrator;
+import net.blockhost.commons.config.migration.Migration;
+import net.blockhost.commons.config.migration.MigrationRegistry;
 
 /// Base class for configuration files that support versioned migrations.
 ///
