@@ -10,29 +10,29 @@ Common utilities and shared code for 6b6t Minecraft plugins.
 | `commons-config` | ConfigLib YAML configuration utilities |
 | `commons-database` | MariaDB/HikariCP database utilities |
 | `commons-message` | MiniMessage formatting and messaging |
-| `commons-command-core` | Platform-independent command framework |
-| `commons-command-bukkit` | Bukkit/Paper command implementation |
-| `commons-command-velocity` | Velocity proxy command implementation |
+| `commons-commands-core` | StrokkCommands core with Brigadier |
+| `commons-commands-bukkit` | StrokkCommands for Bukkit/Paper |
+| `commons-commands-velocity` | StrokkCommands for Velocity |
 
 ## Installation
 
 ### Prerequisites
 
 - Java 25 or higher
-- Gradle or Maven build tool
+- Gradle build tool
 - GitHub account (for accessing GitHub Packages)
 
 ### GitHub Packages Authentication
 
 Since artifacts are published to GitHub Packages, you need to authenticate to download them.
 
-#### Gradle (Kotlin DSL)
-
 Add the repository to your `build.gradle.kts`:
 
 ```kotlin
 repositories {
     mavenCentral()
+    maven("https://eldonexus.de/repository/maven-public/")
+    maven("https://eldonexus.de/repository/maven-snapshots/")
     maven {
         name = "GitHubPackages"
         url = uri("https://maven.pkg.github.com/6b6t/6b6t-commons")
@@ -53,52 +53,7 @@ gpr.key=YOUR_GITHUB_TOKEN
 
 > **Note:** Generate a personal access token at https://github.com/settings/tokens with `read:packages` scope.
 
-#### Gradle (Groovy DSL)
-
-```groovy
-repositories {
-    mavenCentral()
-    maven {
-        name = "GitHubPackages"
-        url = uri("https://maven.pkg.github.com/6b6t/6b6t-commons")
-        credentials {
-            username = project.findProperty("gpr.user") ?: System.getenv("GITHUB_ACTOR")
-            password = project.findProperty("gpr.key") ?: System.getenv("GITHUB_TOKEN")
-        }
-    }
-}
-```
-
-#### Maven
-
-Add the repository to your `pom.xml`:
-
-```xml
-<repositories>
-    <repository>
-        <id>github</id>
-        <url>https://maven.pkg.github.com/6b6t/6b6t-commons</url>
-    </repository>
-</repositories>
-```
-
-Configure authentication in `~/.m2/settings.xml`:
-
-```xml
-<settings>
-    <servers>
-        <server>
-            <id>github</id>
-            <username>YOUR_GITHUB_USERNAME</username>
-            <password>YOUR_GITHUB_TOKEN</password>
-        </server>
-    </servers>
-</settings>
-```
-
 ### Adding Dependencies
-
-#### Gradle (Kotlin DSL)
 
 ```kotlin
 dependencies {
@@ -116,58 +71,12 @@ dependencies {
     
     // Commands - choose based on your platform:
     // For Bukkit/Paper plugins:
-    implementation("net.blockhost.commons:commons-command-bukkit:1.0.0-SNAPSHOT")
+    compileOnly("net.blockhost.commons:commons-commands-bukkit:1.0.0-SNAPSHOT")
+    annotationProcessor("net.strokkur.commands:processor-paper:2.0.0-SNAPSHOT")
     // For Velocity plugins:
-    implementation("net.blockhost.commons:commons-command-velocity:1.0.0-SNAPSHOT")
+    compileOnly("net.blockhost.commons:commons-commands-velocity:1.0.0-SNAPSHOT")
+    annotationProcessor("net.strokkur.commands:processor-velocity:2.0.0-SNAPSHOT")
 }
-```
-
-#### Maven
-
-```xml
-<dependencies>
-    <!-- Core utilities -->
-    <dependency>
-        <groupId>net.blockhost.commons</groupId>
-        <artifactId>commons-core</artifactId>
-        <version>1.0.0-SNAPSHOT</version>
-    </dependency>
-    
-    <!-- Configuration (ConfigLib) -->
-    <dependency>
-        <groupId>net.blockhost.commons</groupId>
-        <artifactId>commons-config</artifactId>
-        <version>1.0.0-SNAPSHOT</version>
-    </dependency>
-    
-    <!-- Database (MariaDB + HikariCP) -->
-    <dependency>
-        <groupId>net.blockhost.commons</groupId>
-        <artifactId>commons-database</artifactId>
-        <version>1.0.0-SNAPSHOT</version>
-    </dependency>
-    
-    <!-- Messaging (MiniMessage) -->
-    <dependency>
-        <groupId>net.blockhost.commons</groupId>
-        <artifactId>commons-message</artifactId>
-        <version>1.0.0-SNAPSHOT</version>
-    </dependency>
-    
-    <!-- Commands - Bukkit/Paper -->
-    <dependency>
-        <groupId>net.blockhost.commons</groupId>
-        <artifactId>commons-command-bukkit</artifactId>
-        <version>1.0.0-SNAPSHOT</version>
-    </dependency>
-    
-    <!-- Commands - Velocity -->
-    <dependency>
-        <groupId>net.blockhost.commons</groupId>
-        <artifactId>commons-command-velocity</artifactId>
-        <version>1.0.0-SNAPSHOT</version>
-    </dependency>
-</dependencies>
 ```
 
 ## Documentation
@@ -204,33 +113,52 @@ try (Connection conn = dataSource.getConnection()) {
 }
 ```
 
-#### Command Framework (Bukkit)
+#### Command Framework (StrokkCommands)
+
+The command modules use [StrokkCommands](https://commands.strokkur.net/docs/) v2.0.0, an annotation-based 
+command framework that generates Brigadier commands at compile time with zero runtime overhead.
+
+**Documentation:** https://commands.strokkur.net/docs/
 
 ```java
-// Create a subcommand
-public class HelpSubCommand implements BukkitSubCommand {
-    @Override
-    public void execute(@NotNull Player player, @NotNull String[] args) {
-        player.sendMessage("Help message here");
+// Define a command using annotations
+@Command("example")
+@Aliases("ex")
+@Description("An example command")
+public class ExampleCommand {
+
+    @Executes
+    void execute(CommandSender sender) {
+        sender.sendRichMessage("<green>Hello from StrokkCommands!");
+    }
+
+    @Executes("greet")
+    void greet(CommandSender sender, Player target) {
+        sender.sendRichMessage("<yellow>Hello, " + target.getName() + "!");
     }
     
-    @Override
-    public @NotNull String getName() {
-        return "help";
+    @Executes("teleport")
+    void teleport(CommandSender sender, @Executor Player player, Player target) {
+        player.teleport(target);
+        sender.sendRichMessage("<green>Teleported to " + target.getName());
     }
 }
 
-// Register commands
-BukkitCommandDispatcher dispatcher = BukkitCommandDispatcher.builder()
-    .defaultSubCommand("help")
-    .register(new HelpSubCommand())
-    .unknownSubCommandHandler((player, args) -> 
-        player.sendMessage("Unknown command: " + args[0]))
-    .build();
-
-plugin.getCommand("mycommand").setExecutor(dispatcher);
-plugin.getCommand("mycommand").setTabCompleter(dispatcher);
+// Register the generated command in your plugin's onLoad()
+public void onLoad() {
+    getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS.newHandler(event -> {
+        ExampleCommandBrigadier.register(event.registrar());
+    }));
+}
 ```
+
+**Key Features:**
+- Annotation-based command definition
+- Compile-time code generation (zero runtime overhead)
+- Native Brigadier integration with full argument type support
+- Automatic tab completion
+- Permission support via `@Permission` annotation
+- Subcommand support
 
 #### Message Service
 

@@ -11,6 +11,12 @@ allprojects {
         maven("https://repo.papermc.io/repository/maven-public/") {
             name = "PaperMC Repository"
         }
+        maven("https://eldonexus.de/repository/maven-public/") {
+            name = "Eldonexus"
+        }
+        maven("https://eldonexus.de/repository/maven-snapshots/") {
+            name = "Eldonexus Snapshots"
+        }
     }
 }
 
