@@ -142,7 +142,11 @@ public final class ConfigMigrator {
     /// 2. Reads the current version
     /// 3. Applies necessary migrations
     /// 4. Saves the migrated data
-    /// 5. Loads the configuration using ConfigLib
+    /// 5. Syncs the configuration (adds new fields, removes obsolete ones)
+    /// 6. Loads the configuration using ConfigLib
+    ///
+    /// The sync step ensures that even if a migration is imperfect, any new fields
+    /// added to the Java class will be written to the file with their default values.
     ///
     /// @param path the path to the configuration file
     /// @param configClass the configuration class (must extend [VersionAwareConfiguration])
@@ -167,8 +171,9 @@ public final class ConfigMigrator {
             throw result.error().orElseGet(() -> new MigrationException("Migration failed with unknown error"));
         }
 
-        // Load the migrated configuration
-        return ConfigLoader.load(path, configClass);
+        // Load and sync the configuration - adds new fields, removes obsolete ones
+        // Only writes to disk if content actually changed
+        return ConfigLoader.updateIfChanged(path, configClass);
     }
 
     /// Migrates a configuration file to the target version and loads it with custom properties.
@@ -196,7 +201,9 @@ public final class ConfigMigrator {
             throw result.error().orElseGet(() -> new MigrationException("Migration failed with unknown error"));
         }
 
-        return YamlConfigurations.load(path, configClass, properties);
+        // Load and sync the configuration - adds new fields, removes obsolete ones
+        // Only writes to disk if content actually changed
+        return ConfigLoader.updateIfChanged(path, configClass, properties);
     }
 
     /// Migrates a configuration file to the target version.

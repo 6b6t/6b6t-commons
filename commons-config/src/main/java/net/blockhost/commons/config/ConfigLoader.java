@@ -4,7 +4,12 @@ import de.exlll.configlib.YamlConfigurationProperties;
 import de.exlll.configlib.YamlConfigurations;
 import lombok.experimental.UtilityClass;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.function.Consumer;
 
@@ -103,5 +108,69 @@ public class ConfigLoader {
     /// Creates a default properties builder with common settings.
     public YamlConfigurationProperties.Builder<?> defaultPropertiesBuilder() {
         return YamlConfigurationProperties.newBuilder();
+    }
+
+    /// Updates a configuration file, adding new fields and removing obsolete ones.
+    ///
+    /// This method only writes to disk if the content actually changed, avoiding
+    /// unnecessary file modifications and timestamp updates.
+    ///
+    /// @param path the path to the configuration file
+    /// @param configClass the configuration class
+    /// @param <T> the configuration type
+    /// @return the loaded configuration
+    public <T> T updateIfChanged(Path path, Class<T> configClass) {
+        Objects.requireNonNull(path, "path");
+        Objects.requireNonNull(configClass, "configClass");
+        return updateIfChanged(path, configClass, YamlConfigurationProperties.newBuilder().build());
+    }
+
+    /// Updates a configuration file with custom properties, only writing if changed.
+    ///
+    /// This method:
+    /// 1. Loads the existing config (with Java defaults for any new fields)
+    /// 2. Serializes it back to YAML (which includes new fields with defaults)
+    /// 3. Compares with the original file content
+    /// 4. Only writes if the content actually changed
+    ///
+    /// This ensures new fields are added to the file and obsolete fields are removed,
+    /// but avoids unnecessary disk writes and timestamp updates when nothing changed.
+    ///
+    /// @param path the path to the configuration file
+    /// @param configClass the configuration class
+    /// @param properties custom ConfigLib properties
+    /// @param <T> the configuration type
+    /// @return the loaded configuration
+    public <T> T updateIfChanged(Path path, Class<T> configClass, YamlConfigurationProperties properties) {
+        Objects.requireNonNull(path, "path");
+        Objects.requireNonNull(configClass, "configClass");
+        Objects.requireNonNull(properties, "properties");
+
+        // If file doesn't exist, just create it
+        if (!Files.exists(path)) {
+            return YamlConfigurations.update(path, configClass, properties);
+        }
+
+        try {
+            // Read current file content as bytes
+            byte[] oldContent = Files.readAllBytes(path);
+
+            // Load existing config - fields not in file get Java defaults
+            T config = YamlConfigurations.load(path, configClass, properties);
+
+            // Serialize to bytes (this includes new fields with their defaults)
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            YamlConfigurations.write(outputStream, configClass, config, properties);
+            byte[] newContent = outputStream.toByteArray();
+
+            // Only write if content changed
+            if (!Arrays.equals(oldContent, newContent)) {
+                Files.write(path, newContent);
+            }
+
+            return config;
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to update configuration: " + path, e);
+        }
     }
 }
