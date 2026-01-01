@@ -84,6 +84,53 @@ MyPluginConfig config = migrator.migrateAndLoad(
 );
 ```
 
+## Configuration Holder Pattern
+
+For dependency injection and config reloading support, use `ConfigurationHolder`:
+
+```java
+// Create a plugin-specific holder
+public class MyPluginConfigHolder extends ConfigurationHolder<MyPluginConfig> {
+    public MyPluginConfigHolder(Path configPath) {
+        super(() -> ConfigLoader.loadOrCreate(configPath, MyPluginConfig.class));
+    }
+}
+
+// Or with migration support
+public class MyPluginConfigHolder extends ConfigurationHolder<MyPluginConfig> {
+    public MyPluginConfigHolder(Path configPath, ConfigMigrator migrator) {
+        super(() -> migrator.migrateAndLoad(configPath, MyPluginConfig.class, 3));
+    }
+}
+```
+
+Usage in services:
+
+```java
+public class MyService {
+    private final MyPluginConfigHolder configHolder;
+
+    public MyService(MyPluginConfigHolder configHolder) {
+        this.configHolder = configHolder;
+    }
+
+    public void doSomething() {
+        MyPluginConfig config = configHolder.get();  // Always gets latest config
+        // Use config...
+    }
+}
+
+// Reload config at runtime
+configHolder.reload();
+
+// Add reload callback
+configHolder.onReload(newConfig -> {
+    logger.info("Config reloaded!");
+});
+```
+
+**Thread Safety:** `ConfigurationHolder` uses `AtomicReference` internally, making it safe to use across threads.
+
 ## Migration Framework
 
 ### Core Components

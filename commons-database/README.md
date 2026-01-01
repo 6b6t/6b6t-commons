@@ -119,6 +119,91 @@ try (Connection conn = MariaDbConnectionFactory.openConnection(credentials)) {
 boolean valid = MariaDbConnectionFactory.validateConnection(credentials);
 ```
 
+## SQLManager - High-Level Connection Management
+
+`SQLManager` provides a complete solution for managing database connections with connection pooling, config reloads, reconnection handling, and table/migration support:
+
+```java
+// Create manager with configuration
+SQLManager sqlManager = SQLManager.builder()
+    .config(databaseConfig)
+    .poolName("MyPlugin-Pool")
+    .logger(plugin.getLogger())
+    .build();
+
+// Register tables to create on connect
+sqlManager.registerTable("""
+    CREATE TABLE IF NOT EXISTS players (
+        uuid VARCHAR(36) PRIMARY KEY,
+        name VARCHAR(16) NOT NULL,
+        last_seen TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+""");
+
+// Register database migrations
+sqlManager.registerMigration(1, "Add email column",
+    "ALTER TABLE players ADD COLUMN email VARCHAR(255)");
+sqlManager.registerMigration(2, "Add index on name",
+    "CREATE INDEX idx_players_name ON players(name)");
+
+// Connect and create tables/run migrations
+sqlManager.connect();
+```
+
+### Using Connections
+
+```java
+// Get connection (returns null on error, no exception thrown)
+Connection conn = sqlManager.getConnection();
+if (conn != null) {
+    try (conn) {
+        // Use connection
+    }
+}
+
+// Or use callback pattern (recommended)
+sqlManager.withConnection(conn -> {
+    try (PreparedStatement stmt = conn.prepareStatement("SELECT * FROM players")) {
+        ResultSet rs = stmt.executeQuery();
+        // Process results
+    }
+});
+
+// With result
+String name = sqlManager.withConnectionResult(conn -> {
+    try (PreparedStatement stmt = conn.prepareStatement("SELECT name FROM players WHERE uuid = ?")) {
+        stmt.setString(1, uuid);
+        ResultSet rs = stmt.executeQuery();
+        return rs.next() ? rs.getString("name") : null;
+    }
+});
+```
+
+### Configuration Reloading
+
+```java
+// Hot-reload database configuration
+sqlManager.reload(newDatabaseConfig);
+
+// Manual reconnect
+sqlManager.reconnect();
+
+// Check connection status
+if (sqlManager.isConnected()) {
+    // Database is available
+}
+```
+
+### Lifecycle Management
+
+```java
+// In your plugin's onEnable
+sqlManager.connect();
+
+// In your plugin's onDisable
+sqlManager.shutdown();
+```
+
 ## Classes
 
 ### DatabaseCredentials
@@ -183,6 +268,19 @@ Connection conn = MariaDbConnectionFactory.openConnection(credentials);
 // Validate connection parameters
 boolean isValid = MariaDbConnectionFactory.validateConnection(credentials);
 ```
+
+### SQLManager
+
+High-level connection manager with full lifecycle support.
+
+| Feature | Description |
+|---------|-------------|
+| Connection Pooling | Uses HikariCP internally |
+| Config Reloads | Hot-reload with `reload(newConfig)` |
+| Auto-Reconnect | Attempts reconnection on connection loss |
+| Table Creation | `registerTable(sql)` runs on connect |
+| DB Migrations | `registerMigration(version, desc, sql)` with tracking |
+| Thread Safety | All operations are thread-safe |
 
 ## Best Practices
 
