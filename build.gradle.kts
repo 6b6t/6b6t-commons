@@ -10,16 +10,24 @@ allprojects {
         maven("https://repo.papermc.io/repository/maven-public/") {
             name = "PaperMC Repository"
         }
-        maven("https://eldonexus.de/repository/maven-public/") {
-            name = "Eldonexus"
+        maven("https://eldonexus.de/repository/maven-releases/") {
+            name = "Eldonexus Releases"
             mavenContent {
                 releasesOnly()
+            }
+            content {
+                includeGroup("net.strokkur.commands")
+                includeGroup("net.strokkur")
             }
         }
         maven("https://eldonexus.de/repository/maven-snapshots/") {
             name = "Eldonexus Snapshots"
             mavenContent {
                 snapshotsOnly()
+            }
+            content {
+                includeGroup("net.strokkur.commands")
+                includeGroup("net.strokkur")
             }
         }
         mavenCentral()
