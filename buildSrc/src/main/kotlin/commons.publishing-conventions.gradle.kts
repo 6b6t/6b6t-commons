@@ -6,12 +6,8 @@ plugins {
 publishing {
     repositories {
         maven {
-            name = "GitHubPackages"
-            url = uri("https://maven.pkg.github.com/6b6t/6b6t-commons")
-            credentials {
-                username = System.getenv("GITHUB_ACTOR") ?: project.findProperty("gpr.user") as String?
-                password = System.getenv("GITHUB_TOKEN") ?: project.findProperty("gpr.key") as String?
-            }
+            name = "LocalPages"
+            url = uri(rootProject.layout.buildDirectory.dir("maven-repo"))
         }
     }
 

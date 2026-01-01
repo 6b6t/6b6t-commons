@@ -20,38 +20,20 @@ Common utilities and shared code for 6b6t Minecraft plugins.
 
 - Java 25 or higher
 - Gradle build tool
-- GitHub account (for accessing GitHub Packages)
 
-### GitHub Packages Authentication
+### Adding the Repository
 
-Since artifacts are published to GitHub Packages, you need to authenticate to download them.
-
-Add the repository to your `build.gradle.kts`:
+Add the repositories to your `build.gradle.kts`:
 
 ```kotlin
 repositories {
     mavenCentral()
+    maven("https://6b6t.github.io/6b6t-commons/maven")
+    // Required for StrokkCommands
     maven("https://eldonexus.de/repository/maven-public/")
     maven("https://eldonexus.de/repository/maven-snapshots/")
-    maven {
-        name = "GitHubPackages"
-        url = uri("https://maven.pkg.github.com/6b6t/6b6t-commons")
-        credentials {
-            username = project.findProperty("gpr.user") as String? ?: System.getenv("GITHUB_ACTOR")
-            password = project.findProperty("gpr.key") as String? ?: System.getenv("GITHUB_TOKEN")
-        }
-    }
 }
 ```
-
-Add credentials to `~/.gradle/gradle.properties`:
-
-```properties
-gpr.user=YOUR_GITHUB_USERNAME
-gpr.key=YOUR_GITHUB_TOKEN
-```
-
-> **Note:** Generate a personal access token at https://github.com/settings/tokens with `read:packages` scope.
 
 ### Adding Dependencies
 
@@ -85,7 +67,7 @@ dependencies {
 
 API documentation is automatically generated and published to GitHub Pages:
 
-**https://6b6t.github.io/6b6t-commons/**
+**https://6b6t.github.io/6b6t-commons/javadoc/**
 
 ### Quick Examples
 
@@ -209,8 +191,9 @@ cd 6b6t-commons
 This project uses GitHub Actions for continuous integration:
 
 - **Build & Test**: Runs on every push and pull request
-- **Publish**: Artifacts are published to GitHub Packages on pushes to `main`/`master` or version tags (`v*`)
-- **Javadoc**: Documentation is deployed to GitHub Pages automatically
+- **Publish**: Artifacts and Javadoc are published to GitHub Pages on pushes to `main`/`master` or version tags (`v*`)
+- **Maven Repository**: https://6b6t.github.io/6b6t-commons/maven/
+- **Javadoc**: https://6b6t.github.io/6b6t-commons/javadoc/
 
 ## License
 

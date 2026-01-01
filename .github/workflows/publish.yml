@@ -40,16 +40,60 @@ jobs:
       - name: Generate Javadoc
         run: ./gradlew aggregateJavadoc
 
-      - name: Upload Javadoc artifact
+      - name: Publish to local Maven repository
+        run: ./gradlew publishAllPublicationsToLocalPagesRepository
+
+      - name: Prepare GitHub Pages content
+        run: |
+          mkdir -p build/pages
+          # Copy Javadoc to /javadoc
+          cp -r build/docs/javadoc build/pages/javadoc
+          # Copy Maven repository to /maven
+          cp -r build/maven-repo build/pages/maven
+          # Create index page
+          cat > build/pages/index.html << 'EOF'
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <title>6b6t Commons</title>
+            <style>
+              body { font-family: system-ui, -apple-system, sans-serif; max-width: 800px; margin: 50px auto; padding: 20px; }
+              h1 { color: #333; }
+              a { color: #0066cc; }
+              .section { margin: 30px 0; padding: 20px; background: #f5f5f5; border-radius: 8px; }
+              pre { background: #2d2d2d; color: #f8f8f2; padding: 15px; border-radius: 5px; overflow-x: auto; }
+            </style>
+          </head>
+          <body>
+            <h1>6b6t Commons</h1>
+            <p>Common utilities and shared code for 6b6t Minecraft plugins.</p>
+            
+            <div class="section">
+              <h2>Javadoc</h2>
+              <p><a href="javadoc/">View API Documentation</a></p>
+            </div>
+            
+            <div class="section">
+              <h2>Maven Repository</h2>
+              <p>Add the repository to your <code>build.gradle.kts</code>:</p>
+              <pre>repositories {
+              maven("https://6b6t.github.io/6b6t-commons/maven")
+          }</pre>
+              <p><a href="maven/">Browse Repository</a></p>
+            </div>
+            
+            <div class="section">
+              <h2>Source Code</h2>
+              <p><a href="https://github.com/6b6t/6b6t-commons">View on GitHub</a></p>
+            </div>
+          </body>
+          </html>
+          EOF
+
+      - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: build/docs/javadoc
-
-      - name: Publish to GitHub Packages
-        if: github.event_name == 'push' && (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
-        run: ./gradlew publish
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          path: build/pages
 
   deploy-docs:
     needs: build
