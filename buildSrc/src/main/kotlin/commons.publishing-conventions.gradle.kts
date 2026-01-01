@@ -5,6 +5,7 @@ plugins {
 
 publishing {
     repositories {
+        mavenLocal()
         maven {
             name = "LocalPages"
             url = uri(rootProject.layout.buildDirectory.dir("maven-repo"))

@@ -1,30 +1,60 @@
 /// Database utilities for 6b6t plugins.
 ///
 /// This package provides utilities for connecting to MariaDB databases,
-/// including connection factories and HikariCP connection pool builders.
-/// ## Quick Start with ConfigLib
+/// including connection factories, HikariCP connection pool builders, and
+/// a full-featured SQL manager with connection pooling, configuration reloads,
+/// reconnection handling, and table migrations.
 ///
-/// The easiest way to add database support to your plugin is to embed
-/// [net.blockhost.commons.database.DatabaseConfig] in your configuration:
-/// <pre>
-/// `class PluginConfig{settings")private DatabaseConfig database = new DatabaseConfig();public DatabaseConfig
-// database(){return database;}}// Load config and create connection poolPluginConfig config =
-// ConfigLoader.loadOrCreate(configPath, PluginConfig.class);HikariDataSource dataSource =
-// HikariDataSourceBuilder.createDataSource(config.database());`</pre>
-/// ## Manual Configuration
+/// ## Quick Start with SQLManager (Recommended)
 ///
-/// For simple, non-pooled connections:
-/// <pre>
-/// `DatabaseCredentials credentials =
-// DatabaseCredentials.builder().host("localhost").port(3306).database("mydb").username("user").password("pass").build();try (Connection conn = MariaDbConnectionFactory.openConnection(credentials)){// Use the connection}`</pre>
+/// The [net.blockhost.commons.database.SQLManager] provides a complete solution
+/// for database management in plugins:
+/// ```java
+/// SQLManager sqlManager = SQLManager.builder()
+///     .config(databaseConfig)
+///     .poolName("MyPlugin-Pool")
+///     .logger(plugin.getLogger())
+///     .build();
 ///
-/// For connection pooling with HikariCP:
-/// <pre>
-/// `HikariDataSource dataSource =
-// HikariDataSourceBuilder.create(credentials).poolName("MyPlugin-Pool").maximumPoolSize(10).build();try (Connection
-// conn = dataSource.getConnection()){// Use the connection}// Remember to close the data source when
-// donedataSource.close();`</pre>
+/// // Register tables
+/// sqlManager.registerTable("CREATE TABLE IF NOT EXISTS players (...)");
 ///
+/// // Connect
+/// sqlManager.connect();
+///
+/// // Use connections (returns null on error, no exception)
+/// Connection conn = sqlManager.getConnection();
+/// if (conn != null) { ... }
+///
+/// // Or use safe callback pattern
+/// sqlManager.withConnection(connection -> {
+///     // Use connection
+/// });
+///
+/// // Reload config at runtime
+/// sqlManager.reload(newConfig);
+///
+/// // Shutdown
+/// sqlManager.shutdown();
+/// ```
+///
+/// ## ConfigLib Integration
+///
+/// Embed [net.blockhost.commons.database.DatabaseConfig] in your plugin config:
+/// ```java
+/// @Configuration
+/// public class PluginConfig {
+///     private DatabaseConfig database = new DatabaseConfig();
+///     public DatabaseConfig database() { return database; }
+/// }
+/// ```
+///
+/// ## Low-Level Access
+///
+/// For simple, non-pooled connections use [net.blockhost.commons.database.MariaDbConnectionFactory].
+/// For direct HikariCP pool creation use [net.blockhost.commons.database.HikariDataSourceBuilder].
+///
+/// @see net.blockhost.commons.database.SQLManager
 /// @see net.blockhost.commons.database.DatabaseConfig
 /// @see net.blockhost.commons.database.DatabaseCredentials
 /// @see net.blockhost.commons.database.MariaDbConnectionFactory
