@@ -7,16 +7,22 @@ allprojects {
     version = "1.0.0-SNAPSHOT"
 
     repositories {
-        mavenCentral()
         maven("https://repo.papermc.io/repository/maven-public/") {
             name = "PaperMC Repository"
         }
         maven("https://eldonexus.de/repository/maven-public/") {
             name = "Eldonexus"
+            mavenContent {
+                releasesOnly()
+            }
         }
         maven("https://eldonexus.de/repository/maven-snapshots/") {
             name = "Eldonexus Snapshots"
+            mavenContent {
+                snapshotsOnly()
+            }
         }
+        mavenCentral()
     }
 }
 
