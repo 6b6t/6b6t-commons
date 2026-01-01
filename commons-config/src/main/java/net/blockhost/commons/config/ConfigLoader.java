@@ -6,7 +6,6 @@ import lombok.experimental.UtilityClass;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
@@ -122,7 +121,8 @@ public class ConfigLoader {
     public <T> T updateIfChanged(Path path, Class<T> configClass) {
         Objects.requireNonNull(path, "path");
         Objects.requireNonNull(configClass, "configClass");
-        return updateIfChanged(path, configClass, YamlConfigurationProperties.newBuilder().build());
+        return updateIfChanged(
+                path, configClass, YamlConfigurationProperties.newBuilder().build());
     }
 
     /// Updates a configuration file with custom properties, only writing if changed.
