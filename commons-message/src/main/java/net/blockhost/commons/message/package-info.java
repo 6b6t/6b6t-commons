@@ -21,6 +21,7 @@
 // playerName));`</pre>
 ///
 /// @see net.blockhost.commons.message.MessageService
+/// @see net.blockhost.commons.message.MiniMessageConverter
 /// @see net.kyori.adventure.text.minimessage.MiniMessage
 @NullMarked
 package net.blockhost.commons.message;
