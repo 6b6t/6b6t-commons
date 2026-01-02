@@ -1,3 +1,6 @@
+import net.ltgt.gradle.errorprone.CheckSeverity
+import net.ltgt.gradle.errorprone.errorprone
+
 plugins {
     `java-library`
     id("commons.formatting-conventions")
@@ -21,6 +24,7 @@ rewrite {
 group = "net.blockhost.commons"
 
 dependencies {
+    errorprone("com.uber.nullaway:nullaway:0.12.15")
     errorprone("com.google.errorprone:error_prone_core:2.38.0")
     spotbugs("com.github.spotbugs:spotbugs:4.9.8")
 
@@ -32,6 +36,7 @@ dependencies {
     // Common annotations
     compileOnly("org.jetbrains:annotations:26.0.2")
     compileOnly("com.github.spotbugs:spotbugs-annotations:4.9.8")
+    api("org.jspecify:jspecify:1.0.0")
 
     // Testing
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
@@ -49,7 +54,18 @@ java {
 }
 
 tasks {
-    compileJava {
+    withType<JavaCompile> {
+        options.errorprone {
+            disableWarningsInGeneratedCode = true
+            check("NullAway", CheckSeverity.ERROR)
+            option("NullAway:AnnotatedPackages", "com.uber")
+        }
+        // Include to disable NullAway on test code
+        if (name.lowercase().contains("test")) {
+            options.errorprone {
+                disable("NullAway")
+            }
+        }
         options.encoding = Charsets.UTF_8.name()
         options.compilerArgs.addAll(
             listOf(
@@ -79,10 +95,6 @@ tasks {
                 addStringOption("Xdoclint:none", "-quiet")
             }
         }
-    }
-
-    withType<JavaCompile> {
-        options.encoding = "UTF-8"
     }
 }
 
