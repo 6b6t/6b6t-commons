@@ -21,8 +21,6 @@ rewrite {
     isExportDatatables = true
 }
 
-group = "net.blockhost.commons"
-
 dependencies {
     errorprone("com.uber.nullaway:nullaway:0.12.15")
     errorprone("com.google.errorprone:error_prone_core:2.38.0")
