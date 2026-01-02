@@ -1,6 +1,6 @@
 package net.blockhost.commons.config.migration;
 
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.nio.file.Path;
 import java.util.List;

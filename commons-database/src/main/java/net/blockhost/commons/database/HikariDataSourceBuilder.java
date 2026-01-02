@@ -2,6 +2,7 @@ package net.blockhost.commons.database;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import org.jspecify.annotations.Nullable;
 
 import java.time.Duration;
 import java.util.Map;
@@ -26,7 +27,7 @@ public final class HikariDataSourceBuilder {
 
     private final DatabaseCredentials credentials;
 
-    private String poolName;
+    private @Nullable String poolName;
     private int maximumPoolSize = 10;
     private int minimumIdle = 2;
     private Duration maxLifetime = Duration.ofMinutes(30);

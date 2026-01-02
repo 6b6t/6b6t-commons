@@ -1,6 +1,6 @@
 package net.blockhost.commons.config.migration;
 
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.time.Duration;
 import java.time.Instant;

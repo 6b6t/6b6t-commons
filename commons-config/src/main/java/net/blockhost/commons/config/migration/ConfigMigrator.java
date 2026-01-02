@@ -4,7 +4,7 @@ import de.exlll.configlib.YamlConfigurationProperties;
 import de.exlll.configlib.YamlConfigurations;
 import net.blockhost.commons.config.ConfigLoader;
 import net.blockhost.commons.config.VersionAwareConfiguration;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -354,7 +354,7 @@ public final class ConfigMigrator {
         private String backupSuffix = ".bak";
         private boolean useTimestampedBackups = false;
         private @Nullable Consumer<Migration> beforeMigrationCallback;
-        private @Nullable MigrationExecutor.MigrationCallback afterMigrationCallback;
+        private MigrationExecutor.@Nullable MigrationCallback afterMigrationCallback;
         private @Nullable Consumer<MigrationException> errorCallback;
 
         private Builder() {}

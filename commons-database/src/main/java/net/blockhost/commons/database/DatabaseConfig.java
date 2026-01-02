@@ -6,7 +6,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
-import org.jetbrains.annotations.NotNull;
 
 import java.time.Duration;
 
@@ -75,7 +74,7 @@ public class DatabaseConfig {
     /// [MariaDbConnectionFactory] or [HikariDataSourceBuilder].
     ///
     /// @return a new DatabaseCredentials instance
-    public @NotNull DatabaseCredentials toCredentials() {
+    public DatabaseCredentials toCredentials() {
         return DatabaseCredentials.builder()
                 .host(host)
                 .port(port)

@@ -4,7 +4,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Singular;
 import lombok.experimental.Accessors;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.time.Duration;
 import java.util.Map;
@@ -32,6 +32,7 @@ import java.util.Objects;
 @Getter
 @Accessors(fluent = true)
 @Builder(toBuilder = true)
+@SuppressWarnings("NullAway.Init") // Lombok @Builder handles field initialization
 public final class DatabaseCredentials {
 
     private final String host;

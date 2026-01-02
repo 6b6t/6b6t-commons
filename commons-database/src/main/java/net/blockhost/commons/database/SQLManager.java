@@ -1,8 +1,7 @@
 package net.blockhost.commons.database;
 
 import com.zaxxer.hikari.HikariDataSource;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -76,12 +75,12 @@ public final class SQLManager {
     private final List<String> tableStatements = new ArrayList<>();
     private final List<Migration> migrations = new ArrayList<>();
 
-    private volatile HikariDataSource dataSource;
+    private volatile @Nullable HikariDataSource dataSource;
     private volatile DatabaseConfig config;
     private volatile boolean connected;
 
-    private final String poolName;
-    private final Logger logger;
+    private final @Nullable String poolName;
+    private final @Nullable Logger logger;
     private final Consumer<String> infoLogger;
     private final Consumer<String> warningLogger;
 
@@ -118,7 +117,8 @@ public final class SQLManager {
     public void connect() {
         lock.writeLock().lock();
         try {
-            if (dataSource != null && !dataSource.isClosed()) {
+            HikariDataSource ds = dataSource;
+            if (ds != null && !ds.isClosed()) {
                 return;
             }
 
@@ -159,7 +159,8 @@ public final class SQLManager {
     public @Nullable Connection getConnection() {
         lock.readLock().lock();
         try {
-            if (dataSource == null || dataSource.isClosed()) {
+            HikariDataSource ds = dataSource;
+            if (ds == null || ds.isClosed()) {
                 // Need write lock for reconnect - release read lock first
                 lock.readLock().unlock();
                 try {
@@ -168,12 +169,13 @@ public final class SQLManager {
                     lock.readLock().lock();
                 }
 
-                if (dataSource == null || dataSource.isClosed()) {
+                ds = dataSource;
+                if (ds == null || ds.isClosed()) {
                     return null;
                 }
             }
 
-            return dataSource.getConnection();
+            return ds.getConnection();
         } catch (SQLException e) {
             warningLogger.accept("Failed to get database connection: " + e.getMessage());
             return null;
@@ -190,7 +192,7 @@ public final class SQLManager {
     ///
     /// @param action the action to execute with the connection
     /// @return true if the action executed successfully, false if no connection was available
-    public boolean withConnection(@NotNull ConnectionConsumer action) {
+    public boolean withConnection(ConnectionConsumer action) {
         Connection connection = getConnection();
         if (connection == null) {
             return false;
@@ -210,7 +212,7 @@ public final class SQLManager {
     /// @param action the action to execute with the connection
     /// @param <T> the type of result
     /// @return the result, or null if no connection was available or an error occurred
-    public <T> @Nullable T withConnectionResult(@NotNull ConnectionFunction<T> action) {
+    public <T> @Nullable T withConnectionResult(ConnectionFunction<T> action) {
         Connection connection = getConnection();
         if (connection == null) {
             return null;
@@ -245,7 +247,7 @@ public final class SQLManager {
     /// connection pool is closed and a new one is created with the new configuration.
     ///
     /// @param newConfig the new database configuration
-    public void reload(@NotNull DatabaseConfig newConfig) {
+    public void reload(DatabaseConfig newConfig) {
         Objects.requireNonNull(newConfig, "newConfig");
         lock.writeLock().lock();
         try {
@@ -264,7 +266,7 @@ public final class SQLManager {
     /// Use `CREATE TABLE IF NOT EXISTS` to make statements idempotent.
     ///
     /// @param createTableSql the SQL statement to create the table
-    public void registerTable(@NotNull String createTableSql) {
+    public void registerTable(String createTableSql) {
         Objects.requireNonNull(createTableSql, "createTableSql");
         tableStatements.add(createTableSql);
     }
@@ -277,7 +279,7 @@ public final class SQLManager {
     /// @param version the migration version (must be unique and sequential)
     /// @param description a description of what the migration does
     /// @param sql the SQL statement(s) to execute
-    public void registerMigration(int version, @NotNull String description, @NotNull String sql) {
+    public void registerMigration(int version, String description, String sql) {
         Objects.requireNonNull(description, "description");
         Objects.requireNonNull(sql, "sql");
         migrations.add(new Migration(version, description, sql));
@@ -304,7 +306,8 @@ public final class SQLManager {
     public boolean isConnected() {
         lock.readLock().lock();
         try {
-            return connected && dataSource != null && !dataSource.isClosed();
+            HikariDataSource ds = dataSource;
+            return connected && ds != null && !ds.isClosed();
         } finally {
             lock.readLock().unlock();
         }
@@ -313,23 +316,25 @@ public final class SQLManager {
     /// Gets the current database configuration.
     ///
     /// @return the current configuration
-    public @NotNull DatabaseConfig getConfig() {
+    public DatabaseConfig getConfig() {
         return config;
     }
 
     private void closeDataSource() {
-        if (dataSource != null && !dataSource.isClosed()) {
-            dataSource.close();
+        HikariDataSource ds = dataSource;
+        if (ds != null && !ds.isClosed()) {
+            ds.close();
         }
         dataSource = null;
     }
 
     private void createTables() {
-        if (tableStatements.isEmpty()) {
+        HikariDataSource ds = dataSource;
+        if (tableStatements.isEmpty() || ds == null) {
             return;
         }
 
-        try (Connection conn = dataSource.getConnection();
+        try (Connection conn = ds.getConnection();
                 Statement stmt = conn.createStatement()) {
 
             for (String sql : tableStatements) {
@@ -344,11 +349,12 @@ public final class SQLManager {
     }
 
     private void runMigrations() {
-        if (migrations.isEmpty()) {
+        HikariDataSource ds = dataSource;
+        if (migrations.isEmpty() || ds == null) {
             return;
         }
 
-        try (Connection conn = dataSource.getConnection();
+        try (Connection conn = ds.getConnection();
                 Statement stmt = conn.createStatement()) {
 
             // Create migrations tracking table
@@ -424,12 +430,13 @@ public final class SQLManager {
     private record Migration(int version, String description, String sql) {}
 
     /// Builder for creating SQLManager instances.
+    @SuppressWarnings("NullAway.Init") // Builder pattern - fields initialized via setters before build()
     public static final class Builder {
-        private DatabaseConfig config;
-        private String poolName;
-        private Logger logger;
-        private Consumer<String> infoLogger;
-        private Consumer<String> warningLogger;
+        private @Nullable DatabaseConfig config;
+        private @Nullable String poolName;
+        private @Nullable Logger logger;
+        private @Nullable Consumer<String> infoLogger;
+        private @Nullable Consumer<String> warningLogger;
 
         private Builder() {}
 
@@ -437,7 +444,7 @@ public final class SQLManager {
         ///
         /// @param config the database configuration
         /// @return this builder
-        public Builder config(@NotNull DatabaseConfig config) {
+        public Builder config(DatabaseConfig config) {
             this.config = Objects.requireNonNull(config, "config");
             return this;
         }
@@ -448,7 +455,7 @@ public final class SQLManager {
         ///
         /// @param poolName the pool name
         /// @return this builder
-        public Builder poolName(@NotNull String poolName) {
+        public Builder poolName(String poolName) {
             this.poolName = Objects.requireNonNull(poolName, "poolName");
             return this;
         }
@@ -468,7 +475,7 @@ public final class SQLManager {
         ///
         /// @param infoLogger the info log consumer
         /// @return this builder
-        public Builder infoLogger(@NotNull Consumer<String> infoLogger) {
+        public Builder infoLogger(Consumer<String> infoLogger) {
             this.infoLogger = Objects.requireNonNull(infoLogger, "infoLogger");
             return this;
         }
@@ -479,7 +486,7 @@ public final class SQLManager {
         ///
         /// @param warningLogger the warning log consumer
         /// @return this builder
-        public Builder warningLogger(@NotNull Consumer<String> warningLogger) {
+        public Builder warningLogger(Consumer<String> warningLogger) {
             this.warningLogger = Objects.requireNonNull(warningLogger, "warningLogger");
             return this;
         }

@@ -1,7 +1,6 @@
 package net.blockhost.commons.config;
 
-import net.blockhost.commons.config.migration.ConfigMigrator;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.nio.file.Path;
 import java.util.Objects;
@@ -85,7 +84,7 @@ public abstract class ConfigurationHolder<T> {
     ///
     /// @return the current configuration
     public T get() {
-        return configRef.get();
+        return Objects.requireNonNull(configRef.get(), "config not initialized");
     }
 
     /// Reloads the configuration from disk.
@@ -126,7 +125,7 @@ public abstract class ConfigurationHolder<T> {
             throw new IllegalStateException(
                     "Cannot save: path or configClass not set. Use save(path, configClass) instead.");
         }
-        ConfigLoader.save(configPath, configClass, configRef.get());
+        ConfigLoader.save(configPath, configClass, get());
     }
 
     /// Saves the current configuration to disk.
@@ -134,7 +133,7 @@ public abstract class ConfigurationHolder<T> {
     /// @param path the path to save to
     /// @param configClass the configuration class
     public void save(Path path, Class<T> configClass) {
-        ConfigLoader.save(path, configClass, configRef.get());
+        ConfigLoader.save(path, configClass, get());
     }
 
     /// Gets the path where this configuration is stored.
