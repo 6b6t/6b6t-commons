@@ -11,8 +11,4 @@ dependencies {
     compileOnly(libs.velocity.api)
     compileOnly(libs.strokkcommands.annotations.velocity)
     annotationProcessor(libs.strokkcommands.processor.velocity)
-
-    compileOnly(libs.jetbrains.annotations)
-    compileOnly(libs.spotbugs.annotations)
-    compileOnly(libs.jspecify)
 }

@@ -11,8 +11,4 @@ dependencies {
     compileOnly(libs.paper.api)
     compileOnly(libs.strokkcommands.annotations.paper)
     annotationProcessor(libs.strokkcommands.processor.paper)
-
-    compileOnly(libs.jetbrains.annotations)
-    compileOnly(libs.spotbugs.annotations)
-    compileOnly(libs.jspecify)
 }

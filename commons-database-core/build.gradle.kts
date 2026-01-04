@@ -8,8 +8,4 @@ description = "Core database utilities for 6b6t plugins - HikariCP connection po
 dependencies {
     api(projects.commonsConfig)
     api(libs.hikaricp)
-
-    compileOnly(libs.jetbrains.annotations)
-    compileOnly(libs.spotbugs.annotations)
-    compileOnly(libs.jspecify)
 }

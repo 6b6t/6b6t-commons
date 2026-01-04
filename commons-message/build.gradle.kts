@@ -11,7 +11,4 @@ dependencies {
     api(libs.configlib.yaml)
 
     compileOnly(libs.paper.api)
-    compileOnly(libs.jetbrains.annotations)
-    compileOnly(libs.spotbugs.annotations)
-    compileOnly(libs.jspecify)
 }

@@ -9,8 +9,4 @@ dependencies {
     api(project(":commons-config"))
     api(project(":commons-message"))
     api(libs.brigadier)
-
-    compileOnly(libs.jetbrains.annotations)
-    compileOnly(libs.spotbugs.annotations)
-    compileOnly(libs.jspecify)
 }
