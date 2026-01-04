@@ -29,18 +29,12 @@ import java.util.logging.Logger;
 /// - **Table Management**: Built-in support for table creation and migrations
 /// - **Thread Safety**: All operations are thread-safe
 ///
-/// ## Example Usage
+/// ## Example Usage with PooledDatabaseConfig (Recommended)
 /// ```java
-/// DatabaseCredentials credentials = DatabaseCredentials.builder()
-///     .driverType(DriverType.MARIADB)
-///     .host("localhost")
-///     .database("mydb")
-///     .username("user")
-///     .password("pass")
-///     .build();
+/// // Using MariaDbConfig from commons-database-mariadb
+/// MariaDbConfig dbConfig = config.database();
 ///
-/// SQLManager sqlManager = SQLManager.builder()
-///     .credentials(credentials)
+/// SQLManager sqlManager = SQLManager.create(dbConfig)
 ///     .poolName("MyPlugin-Pool")
 ///     .logger(plugin.getLogger())
 ///     .build();
@@ -56,27 +50,29 @@ import java.util.logging.Logger;
 /// // Connect and create tables
 /// sqlManager.connect();
 ///
-/// // Get connections (returns null on error, no exception thrown)
-/// Connection conn = sqlManager.getConnection();
-/// if (conn != null) {
-///     try (conn) {
-///         // Use connection
-///     }
-/// }
-///
-/// // Or use the safe connection method with callback
+/// // Use connections safely with callbacks
 /// sqlManager.withConnection(connection -> {
 ///     // Use connection safely
 /// });
-///
-/// // Reload configuration
-/// sqlManager.reload(newCredentials);
 ///
 /// // Shutdown when done
 /// sqlManager.shutdown();
 /// ```
 ///
+/// ## Using Withers for Config Overrides
+/// ```java
+/// // Create a modified config for a specific use case
+/// MariaDbConfig authMeConfig = config.database()
+///     .withDatabase("authme")
+///     .withMaxPoolSize(5);
+///
+/// SQLManager authMeManager = SQLManager.create(authMeConfig)
+///     .poolName("AuthMe-Pool")
+///     .build();
+/// ```
+///
 /// @see DatabaseCredentials
+/// @see PooledDatabaseConfig
 /// @see HikariDataSourceBuilder
 public final class SQLManager {
 
@@ -113,9 +109,25 @@ public final class SQLManager {
                 };
     }
 
+    /// Creates a new builder for SQLManager using a pooled database configuration.
+    ///
+    /// This is the recommended way to create an SQLManager. The configuration
+    /// provides credentials, pool size, and idle connection settings.
+    ///
+    /// @param config the pooled database configuration
+    /// @return a new builder instance with config applied
+    public static Builder create(PooledDatabaseConfig config) {
+        Objects.requireNonNull(config, "config");
+        return new Builder()
+                .credentials(config.toCredentials())
+                .maxPoolSize(config.maxPoolSize())
+                .minIdle(config.minIdle());
+    }
+
     /// Creates a new builder for SQLManager.
     ///
     /// @return a new builder instance
+    @Deprecated(forRemoval = true)
     public static Builder builder() {
         return new Builder();
     }
@@ -457,11 +469,26 @@ public final class SQLManager {
 
         private Builder() {}
 
+        /// Sets all database settings from a pooled database configuration.
+        ///
+        /// This sets credentials, maxPoolSize, and minIdle from the config.
+        /// Any previous values for these settings will be overwritten.
+        ///
+        /// @param config the pooled database configuration
+        /// @return this builder
+        public Builder config(PooledDatabaseConfig config) {
+            Objects.requireNonNull(config, "config");
+            this.credentials = config.toCredentials();
+            this.maxPoolSize = config.maxPoolSize();
+            this.minIdle = config.minIdle();
+            return this;
+        }
+
         /// Sets the database credentials.
         ///
         /// @param credentials the database credentials
         /// @return this builder
-        public Builder credentials(DatabaseCredentials credentials) {
+        Builder credentials(DatabaseCredentials credentials) {
             this.credentials = Objects.requireNonNull(credentials, "credentials");
             return this;
         }
@@ -470,7 +497,7 @@ public final class SQLManager {
         ///
         /// @param maxPoolSize the maximum number of connections in the pool
         /// @return this builder
-        public Builder maxPoolSize(int maxPoolSize) {
+        Builder maxPoolSize(int maxPoolSize) {
             this.maxPoolSize = maxPoolSize;
             return this;
         }
@@ -479,7 +506,7 @@ public final class SQLManager {
         ///
         /// @param minIdle the minimum number of idle connections
         /// @return this builder
-        public Builder minIdle(int minIdle) {
+        Builder minIdle(int minIdle) {
             this.minIdle = minIdle;
             return this;
         }

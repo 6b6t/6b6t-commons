@@ -2,6 +2,9 @@
 # Java
 java = "25"
 
+# Immutables
+immutables = "2.10.1"
+
 # Database
 mariadb = "3.5.6"
 postgresql = "42.7.4"
@@ -38,6 +41,11 @@ junit = "5.13.0"
 mockito = "5.20.0"
 
 [libraries]
+# Immutables
+immutables-value = { module = "org.immutables:value", version.ref = "immutables" }
+immutables-builder = { module = "org.immutables:builder", version.ref = "immutables" }
+immutables-annotations = { module = "org.immutables:value-annotations", version.ref = "immutables" }
+
 # Database
 mariadb-java-client = { module = "org.mariadb.jdbc:mariadb-java-client", version.ref = "mariadb" }
 postgresql = { module = "org.postgresql:postgresql", version.ref = "postgresql" }

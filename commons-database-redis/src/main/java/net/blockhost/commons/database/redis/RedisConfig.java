@@ -5,6 +5,7 @@ import de.exlll.configlib.Configuration;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.With;
 import lombok.experimental.Accessors;
 
 /// ConfigLib-compatible Redis configuration class.
@@ -32,6 +33,7 @@ import lombok.experimental.Accessors;
 @Accessors(fluent = true)
 @NoArgsConstructor
 @AllArgsConstructor
+@With
 public class RedisConfig {
 
     @Comment("The Redis server hostname or IP address")

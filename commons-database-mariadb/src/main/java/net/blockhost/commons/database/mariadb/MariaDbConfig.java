@@ -5,8 +5,10 @@ import de.exlll.configlib.Configuration;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.With;
 import lombok.experimental.Accessors;
 import net.blockhost.commons.database.core.DatabaseCredentials;
+import net.blockhost.commons.database.core.PooledDatabaseConfig;
 
 import java.time.Duration;
 
@@ -29,14 +31,20 @@ import java.time.Duration;
 /// }
 /// ```
 ///
-/// To use with the database utilities, convert to [DatabaseCredentials]:
+/// To use with SQLManager directly:
 /// ```java
-/// DatabaseCredentials credentials = config.database().toCredentials();
-/// SQLManager sqlManager = SQLManager.builder()
-///     .credentials(credentials)
-///     .maxPoolSize(config.database().maxPoolSize())
-///     .minIdle(config.database().minIdle())
+/// SQLManager sqlManager = SQLManager.create(config.database())
+///     .poolName("MyPlugin-Pool")
+///     .logger(logger)
 ///     .build();
+/// ```
+///
+/// Use withers to create modified copies for specific use cases:
+/// ```java
+/// // Create a config for a specific database
+/// MariaDbConfig authMeConfig = config.database()
+///     .withDatabase("authme")
+///     .withMaxPoolSize(5);
 /// ```
 ///
 /// @see DatabaseCredentials
@@ -46,7 +54,8 @@ import java.time.Duration;
 @Accessors(fluent = true)
 @NoArgsConstructor
 @AllArgsConstructor
-public class MariaDbConfig {
+@With
+public class MariaDbConfig implements PooledDatabaseConfig {
 
     /// MariaDB JDBC driver class name.
     public static final String DRIVER_CLASS = "org.mariadb.jdbc.Driver";
@@ -81,6 +90,7 @@ public class MariaDbConfig {
     /// [net.blockhost.commons.database.core.SQLManager] or [net.blockhost.commons.database.core.HikariDataSourceBuilder].
     ///
     /// @return a new DatabaseCredentials instance
+    @Override
     public DatabaseCredentials toCredentials() {
         return DatabaseCredentials.builder()
                 .jdbcUrl(jdbcUrl())
