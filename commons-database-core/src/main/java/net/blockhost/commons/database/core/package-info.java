@@ -13,10 +13,7 @@
 /// // Using MariaDbConfig from commons-database-mariadb
 /// MariaDbConfig dbConfig = config.database();
 ///
-/// SQLManager sqlManager = SQLManager.builder()
-///     .credentials(dbConfig.toCredentials())
-///     .maxPoolSize(dbConfig.maxPoolSize())
-///     .minIdle(dbConfig.minIdle())
+/// SQLManager sqlManager = SQLManager.create(dbConfig)
 ///     .poolName("MyPlugin-Pool")
 ///     .logger(plugin.getLogger())
 ///     .build();

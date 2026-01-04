@@ -124,14 +124,6 @@ public final class SQLManager {
                 .minIdle(config.minIdle());
     }
 
-    /// Creates a new builder for SQLManager.
-    ///
-    /// @return a new builder instance
-    @Deprecated(forRemoval = true)
-    public static Builder builder() {
-        return new Builder();
-    }
-
     /// Connects to the database and initializes the connection pool.
     ///
     /// This method will create the HikariCP connection pool using the current
@@ -484,29 +476,17 @@ public final class SQLManager {
             return this;
         }
 
-        /// Sets the database credentials.
-        ///
-        /// @param credentials the database credentials
-        /// @return this builder
-        Builder credentials(DatabaseCredentials credentials) {
+        private Builder credentials(DatabaseCredentials credentials) {
             this.credentials = Objects.requireNonNull(credentials, "credentials");
             return this;
         }
 
-        /// Sets the maximum pool size.
-        ///
-        /// @param maxPoolSize the maximum number of connections in the pool
-        /// @return this builder
-        Builder maxPoolSize(int maxPoolSize) {
+        private Builder maxPoolSize(int maxPoolSize) {
             this.maxPoolSize = maxPoolSize;
             return this;
         }
 
-        /// Sets the minimum idle connections.
-        ///
-        /// @param minIdle the minimum number of idle connections
-        /// @return this builder
-        Builder minIdle(int minIdle) {
+        private Builder minIdle(int minIdle) {
             this.minIdle = minIdle;
             return this;
         }

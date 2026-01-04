@@ -15,10 +15,7 @@
 /// }
 ///
 /// // Create SQLManager from config
-/// SQLManager sqlManager = SQLManager.builder()
-///     .credentials(config.database().toCredentials())
-///     .maxPoolSize(config.database().maxPoolSize())
-///     .minIdle(config.database().minIdle())
+/// SQLManager sqlManager = SQLManager.create(config.database())
 ///     .poolName("MyPlugin-Pool")
 ///     .logger(plugin.getLogger())
 ///     .build();
