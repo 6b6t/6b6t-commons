@@ -6,13 +6,13 @@
 ///
 /// ## ConfigLib Integration
 ///
-/// Use {@link MiniMessageSerializer} to automatically convert legacy color codes
+/// Use {@link MiniMessageConfigSerializer} to automatically convert legacy color codes
 /// in your configuration files:
 ///
 /// ```java
 /// @Configuration
 /// public class MyConfig {
-///     @SerializeWith(serializer = MiniMessageSerializer.class)
+///     @SerializeWith(serializer = MiniMessageConfigSerializer.class)
 ///     public String message = "<green>Welcome!";
 /// }
 /// ```
@@ -29,7 +29,7 @@
 ///
 /// @see net.blockhost.commons.message.MessageService
 /// @see net.blockhost.commons.message.MiniMessageConverter
-/// @see net.blockhost.commons.message.MiniMessageSerializer
+/// @see net.blockhost.commons.message.MiniMessageConfigSerializer
 /// @see net.kyori.adventure.text.minimessage.MiniMessage
 @NullMarked
 package net.blockhost.commons.message;

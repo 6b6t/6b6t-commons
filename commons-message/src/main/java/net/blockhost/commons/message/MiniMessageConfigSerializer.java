@@ -12,10 +12,10 @@ import de.exlll.configlib.Serializer;
 /// ```java
 /// @Configuration
 /// public class MyConfig {
-///     @SerializeWith(serializer = MiniMessageSerializer.class)
+///     @SerializeWith(serializer = MiniMessageConfigSerializer.class)
 ///     public String welcomeMessage = "<green>Welcome!";
 ///
-///     @SerializeWith(serializer = MiniMessageSerializer.class)
+///     @SerializeWith(serializer = MiniMessageConfigSerializer.class)
 ///     public String legacyMessage = "&aThis will be converted";
 /// }
 /// ```
@@ -31,10 +31,10 @@ import de.exlll.configlib.Serializer;
 ///
 /// @see MiniMessageConverter
 /// @see de.exlll.configlib.SerializeWith
-public final class MiniMessageSerializer implements Serializer<String, String> {
+public final class MiniMessageConfigSerializer implements Serializer<String, String> {
 
     /// Creates a new MiniMessage serializer.
-    public MiniMessageSerializer() {}
+    public MiniMessageConfigSerializer() {}
 
     /// Serializes a MiniMessage string for storage.
     ///
