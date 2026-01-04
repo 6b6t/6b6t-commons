@@ -27,9 +27,14 @@ develocity {
 }
 
 include("commons-core")
-include("commons-database")
 include("commons-config")
 include("commons-message")
 include("commons-commands-core")
 include("commons-commands-bukkit")
 include("commons-commands-velocity")
+
+// Database modules
+include("commons-database-core")
+include("commons-database-mariadb")
+include("commons-database-postgres")
+include("commons-database-redis")

@@ -2,9 +2,11 @@
 # Java
 java = "25"
 
-# MariaDB
+# Database
 mariadb = "3.5.6"
+postgresql = "42.7.4"
 hikaricp = "7.0.2"
+jedis = "5.2.0"
 
 # ConfigLib
 configlib = "4.7.0"
@@ -38,7 +40,9 @@ mockito = "5.20.0"
 [libraries]
 # Database
 mariadb-java-client = { module = "org.mariadb.jdbc:mariadb-java-client", version.ref = "mariadb" }
+postgresql = { module = "org.postgresql:postgresql", version.ref = "postgresql" }
 hikaricp = { module = "com.zaxxer:HikariCP", version.ref = "hikaricp" }
+jedis = { module = "redis.clients:jedis", version.ref = "jedis" }
 
 # ConfigLib
 configlib-yaml = { module = "de.exlll:configlib-yaml", version.ref = "configlib" }

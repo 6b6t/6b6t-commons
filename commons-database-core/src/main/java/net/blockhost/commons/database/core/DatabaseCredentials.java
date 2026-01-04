@@ -1,4 +1,4 @@
-package net.blockhost.commons.database;
+package net.blockhost.commons.database.core;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -12,22 +12,21 @@ import java.util.Objects;
 
 /// Immutable holder for database connection credentials and configuration.
 ///
-/// This class encapsulates all the information needed to connect to a MariaDB database,
-/// including host, port, database name, credentials, timeout settings, and additional
-/// connection properties.
+/// This class encapsulates all the information needed to connect to a SQL database,
+/// including JDBC URL, driver class, credentials, timeout settings, and additional
+/// connection properties. It is dialect-independent - the specific database modules
+/// (mariadb, postgres) provide the JDBC URL and driver class.
 ///
 /// Use the builder to create instances:
 /// ```java
 /// DatabaseCredentials credentials = DatabaseCredentials.builder()
-///     .host("localhost")
-///     .port(3306)
-///     .database("mydb")
+///     .jdbcUrl("jdbc:mariadb://localhost:3306/mydb")
+///     .driverClassName("org.mariadb.jdbc.Driver")
 ///     .username("user")
 ///     .password("pass")
 ///     .build();
 /// ```
 ///
-/// @see MariaDbConnectionFactory
 /// @see HikariDataSourceBuilder
 @Getter
 @Accessors(fluent = true)
@@ -35,12 +34,8 @@ import java.util.Objects;
 @SuppressWarnings("NullAway.Init") // Lombok @Builder handles field initialization
 public final class DatabaseCredentials {
 
-    private final String host;
-
-    @Builder.Default
-    private final int port = 3306;
-
-    private final String database;
+    private final String jdbcUrl;
+    private final String driverClassName;
     private final String username;
 
     @Builder.Default
@@ -52,35 +47,18 @@ public final class DatabaseCredentials {
     @Singular
     private final Map<String, String> properties;
 
-    /// Constructs the JDBC URL for MariaDB connections.
-    ///
-    /// @return the JDBC URL string
-    public String jdbcUrl() {
-        return "jdbc:mariadb://%s:%d/%s".formatted(host, port, database);
-    }
-
     /// Custom builder with validation.
     public static class DatabaseCredentialsBuilder {
 
-        /// Sets the database host address.
-        public DatabaseCredentialsBuilder host(String host) {
-            this.host = Objects.requireNonNull(host, "host").trim();
+        /// Sets the JDBC URL for the database connection.
+        public DatabaseCredentialsBuilder jdbcUrl(String jdbcUrl) {
+            this.jdbcUrl = Objects.requireNonNull(jdbcUrl, "jdbcUrl").trim();
             return this;
         }
 
-        /// Sets the database port.
-        public DatabaseCredentialsBuilder port(int port) {
-            if (port <= 0) {
-                throw new IllegalArgumentException("Port must be positive: " + port);
-            }
-            this.port$value = port;
-            this.port$set = true;
-            return this;
-        }
-
-        /// Sets the database name.
-        public DatabaseCredentialsBuilder database(String database) {
-            this.database = Objects.requireNonNull(database, "database").trim();
+        /// Sets the JDBC driver class name.
+        public DatabaseCredentialsBuilder driverClassName(String driverClassName) {
+            this.driverClassName = Objects.requireNonNull(driverClassName, "driverClassName").trim();
             return this;
         }
 

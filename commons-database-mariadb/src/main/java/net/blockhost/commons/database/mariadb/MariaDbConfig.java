@@ -1,4 +1,4 @@
-package net.blockhost.commons.database;
+package net.blockhost.commons.database.mariadb;
 
 import de.exlll.configlib.Comment;
 import de.exlll.configlib.Configuration;
@@ -6,10 +6,11 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
+import net.blockhost.commons.database.core.DatabaseCredentials;
 
 import java.time.Duration;
 
-/// ConfigLib-compatible database configuration class.
+/// ConfigLib-compatible MariaDB database configuration class.
 ///
 /// This class can be embedded in your plugin's configuration to provide
 /// database connection settings. It uses ConfigLib annotations for YAML
@@ -20,9 +21,9 @@ import java.time.Duration;
 /// @Configuration
 /// public class PluginConfig {
 ///     @Comment("Database connection settings")
-///     private DatabaseConfig database = new DatabaseConfig();
+///     private MariaDbConfig database = new MariaDbConfig();
 ///
-///     public DatabaseConfig database() {
+///     public MariaDbConfig database() {
 ///         return database;
 ///     }
 /// }
@@ -31,18 +32,24 @@ import java.time.Duration;
 /// To use with the database utilities, convert to [DatabaseCredentials]:
 /// ```java
 /// DatabaseCredentials credentials = config.database().toCredentials();
-/// HikariDataSource dataSource = HikariDataSourceBuilder.createDataSource(config.database());
+/// SQLManager sqlManager = SQLManager.builder()
+///     .credentials(credentials)
+///     .maxPoolSize(config.database().maxPoolSize())
+///     .minIdle(config.database().minIdle())
+///     .build();
 /// ```
 ///
 /// @see DatabaseCredentials
-/// @see MariaDbConnectionFactory
-/// @see HikariDataSourceBuilder
+/// @see net.blockhost.commons.database.core.SQLManager
 @Configuration
 @Getter
 @Accessors(fluent = true)
 @NoArgsConstructor
 @AllArgsConstructor
-public class DatabaseConfig {
+public class MariaDbConfig {
+
+    /// MariaDB JDBC driver class name.
+    public static final String DRIVER_CLASS = "org.mariadb.jdbc.Driver";
 
     @Comment("The database server hostname or IP address")
     private String host = "localhost";
@@ -71,14 +78,13 @@ public class DatabaseConfig {
     /// Converts this configuration to a [DatabaseCredentials] instance.
     ///
     /// This is the recommended way to use the configuration with
-    /// [MariaDbConnectionFactory] or [HikariDataSourceBuilder].
+    /// [net.blockhost.commons.database.core.SQLManager] or [net.blockhost.commons.database.core.HikariDataSourceBuilder].
     ///
     /// @return a new DatabaseCredentials instance
     public DatabaseCredentials toCredentials() {
         return DatabaseCredentials.builder()
-                .host(host)
-                .port(port)
-                .database(database)
+                .jdbcUrl(jdbcUrl())
+                .driverClassName(DRIVER_CLASS)
                 .username(username)
                 .password(password)
                 .connectionTimeout(Duration.ofSeconds(connectionTimeoutSeconds))

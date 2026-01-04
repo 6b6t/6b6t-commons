@@ -1,4 +1,4 @@
-package net.blockhost.commons.database;
+package net.blockhost.commons.database.core;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
@@ -11,19 +11,27 @@ import java.util.Objects;
 /// Builder for creating HikariCP connection pool data sources.
 ///
 /// This builder provides a fluent API for configuring HikariCP connection pools
-/// with sensible defaults for MariaDB connections. It integrates with
-/// [DatabaseCredentials] for easy configuration.
+/// with sensible defaults. It works with any supported [DriverType].
 ///
 /// Example usage:
-/// <pre>
-/// `DatabaseCredentials credentials =
-// DatabaseCredentials.builder().host("localhost").database("mydb").username("user").password("pass").build();HikariDataSource dataSource = HikariDataSourceBuilder.create(credentials).poolName("MyApp-Pool").maximumPoolSize(10).build();`</pre>
+/// ```java
+/// DatabaseCredentials credentials = DatabaseCredentials.builder()
+///     .driverType(DriverType.MARIADB)
+///     .host("localhost")
+///     .database("mydb")
+///     .username("user")
+///     .password("pass")
+///     .build();
+///
+/// HikariDataSource dataSource = HikariDataSourceBuilder.create(credentials)
+///     .poolName("MyApp-Pool")
+///     .maximumPoolSize(10)
+///     .build();
+/// ```
 ///
 /// @see DatabaseCredentials
 /// @see HikariDataSource
 public final class HikariDataSourceBuilder {
-
-    private static final String DRIVER_CLASS = "org.mariadb.jdbc.Driver";
 
     private final DatabaseCredentials credentials;
 
@@ -50,30 +58,6 @@ public final class HikariDataSourceBuilder {
     /// @return a new builder instance
     public static HikariDataSourceBuilder create(DatabaseCredentials credentials) {
         return new HikariDataSourceBuilder(credentials);
-    }
-
-    /// Creates a new builder from a [DatabaseConfig].
-    ///
-    /// This is a convenience method that converts the config to credentials
-    /// and applies the pool size settings from the config.
-    ///
-    /// @param config the database configuration
-    /// @return a new builder instance with pool settings applied
-    public static HikariDataSourceBuilder create(DatabaseConfig config) {
-        Objects.requireNonNull(config, "config");
-        return new HikariDataSourceBuilder(config.toCredentials())
-                .maximumPoolSize(config.maxPoolSize())
-                .minimumIdle(config.minIdle());
-    }
-
-    /// Creates and builds a HikariDataSource directly from a [DatabaseConfig].
-    ///
-    /// This is a convenience method for quick setup when default settings are acceptable.
-    ///
-    /// @param config the database configuration
-    /// @return a new HikariDataSource instance
-    public static HikariDataSource createDataSource(DatabaseConfig config) {
-        return create(config).build();
     }
 
     /// Sets the name of the connection pool.
@@ -190,7 +174,7 @@ public final class HikariDataSourceBuilder {
         HikariConfig config = new HikariConfig();
 
         // Basic connection settings
-        config.setDriverClassName(DRIVER_CLASS);
+        config.setDriverClassName(credentials.driverClassName());
         config.setJdbcUrl(credentials.jdbcUrl());
         config.setUsername(credentials.username());
         config.setPassword(credentials.password());
@@ -206,7 +190,7 @@ public final class HikariDataSourceBuilder {
         config.setConnectionTimeout(connectionTimeout.toMillis());
         config.setValidationTimeout(validationTimeout.toMillis());
 
-        // MariaDB-specific optimizations
+        // Database-specific optimizations
         config.addDataSourceProperty("cachePrepStmts", String.valueOf(cachePrepStmts));
         config.addDataSourceProperty("prepStmtCacheSize", String.valueOf(prepStmtCacheSize));
         config.addDataSourceProperty("prepStmtCacheSqlLimit", String.valueOf(prepStmtCacheSqlLimit));

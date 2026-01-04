@@ -3,8 +3,8 @@ plugins {
 }
 
 allprojects {
-    group = "net.blockhost.commons"
-    version = "1.0.0-SNAPSHOT"
+    group = "net.blockhost"
+    version = "1.1.0-SNAPSHOT"
 
     repositories {
         maven("https://repo.papermc.io/repository/maven-public/") {

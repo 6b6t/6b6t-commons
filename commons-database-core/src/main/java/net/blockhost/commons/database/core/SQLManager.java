@@ -1,4 +1,4 @@
-package net.blockhost.commons.database;
+package net.blockhost.commons.database.core;
 
 import com.zaxxer.hikari.HikariDataSource;
 import org.jspecify.annotations.Nullable;
@@ -7,6 +7,8 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -29,9 +31,16 @@ import java.util.logging.Logger;
 ///
 /// ## Example Usage
 /// ```java
-/// // Create manager with configuration
+/// DatabaseCredentials credentials = DatabaseCredentials.builder()
+///     .driverType(DriverType.MARIADB)
+///     .host("localhost")
+///     .database("mydb")
+///     .username("user")
+///     .password("pass")
+///     .build();
+///
 /// SQLManager sqlManager = SQLManager.builder()
-///     .config(databaseConfig)
+///     .credentials(credentials)
 ///     .poolName("MyPlugin-Pool")
 ///     .logger(plugin.getLogger())
 ///     .build();
@@ -61,13 +70,13 @@ import java.util.logging.Logger;
 /// });
 ///
 /// // Reload configuration
-/// sqlManager.reload(newConfig);
+/// sqlManager.reload(newCredentials);
 ///
 /// // Shutdown when done
 /// sqlManager.shutdown();
 /// ```
 ///
-/// @see DatabaseConfig
+/// @see DatabaseCredentials
 /// @see HikariDataSourceBuilder
 public final class SQLManager {
 
@@ -76,16 +85,20 @@ public final class SQLManager {
     private final List<Migration> migrations = new ArrayList<>();
 
     private volatile @Nullable HikariDataSource dataSource;
-    private volatile DatabaseConfig config;
+    private volatile DatabaseCredentials credentials;
     private volatile boolean connected;
 
+    private final int maxPoolSize;
+    private final int minIdle;
     private final @Nullable String poolName;
     private final @Nullable Logger logger;
     private final Consumer<String> infoLogger;
     private final Consumer<String> warningLogger;
 
     private SQLManager(Builder builder) {
-        this.config = Objects.requireNonNull(builder.config, "config");
+        this.credentials = Objects.requireNonNull(builder.credentials, "credentials");
+        this.maxPoolSize = builder.maxPoolSize;
+        this.minIdle = builder.minIdle;
         this.poolName = builder.poolName;
         this.logger = builder.logger;
         this.infoLogger = builder.infoLogger != null
@@ -122,7 +135,9 @@ public final class SQLManager {
                 return;
             }
 
-            HikariDataSourceBuilder hikariBuilder = HikariDataSourceBuilder.create(config);
+            HikariDataSourceBuilder hikariBuilder = HikariDataSourceBuilder.create(credentials)
+                    .maximumPoolSize(maxPoolSize)
+                    .minimumIdle(minIdle);
             if (poolName != null) {
                 hikariBuilder.poolName(poolName);
             }
@@ -130,7 +145,7 @@ public final class SQLManager {
             dataSource = hikariBuilder.build();
             connected = true;
 
-            infoLogger.accept("Connected to database: " + config.database());
+            infoLogger.accept("Connected to database: " + credentials.jdbcUrl());
 
             // Create tables and run migrations
             createTables();
@@ -246,12 +261,12 @@ public final class SQLManager {
     /// This method allows hot-reloading of database configuration. The existing
     /// connection pool is closed and a new one is created with the new configuration.
     ///
-    /// @param newConfig the new database configuration
-    public void reload(DatabaseConfig newConfig) {
-        Objects.requireNonNull(newConfig, "newConfig");
+    /// @param newCredentials the new database credentials
+    public void reload(DatabaseCredentials newCredentials) {
+        Objects.requireNonNull(newCredentials, "newCredentials");
         lock.writeLock().lock();
         try {
-            this.config = newConfig;
+            this.credentials = newCredentials;
             closeDataSource();
             connected = false;
         } finally {
@@ -313,11 +328,11 @@ public final class SQLManager {
         }
     }
 
-    /// Gets the current database configuration.
+    /// Gets the current database credentials.
     ///
-    /// @return the current configuration
-    public DatabaseConfig getConfig() {
-        return config;
+    /// @return the current credentials
+    public DatabaseCredentials getCredentials() {
+        return credentials;
     }
 
     private void closeDataSource() {
@@ -367,7 +382,7 @@ public final class SQLManager {
             """);
 
             // Get already applied migrations
-            var appliedVersions = new java.util.HashSet<Integer>();
+            var appliedVersions = new HashSet<Integer>();
             try (var rs = stmt.executeQuery("SELECT version FROM _migrations")) {
                 while (rs.next()) {
                     appliedVersions.add(rs.getInt("version"));
@@ -377,7 +392,7 @@ public final class SQLManager {
             // Apply pending migrations
             int applied = 0;
             for (Migration migration : migrations.stream()
-                    .sorted(java.util.Comparator.comparingInt(Migration::version))
+                    .sorted(Comparator.comparingInt(Migration::version))
                     .toList()) {
 
                 if (appliedVersions.contains(migration.version())) {
@@ -432,7 +447,9 @@ public final class SQLManager {
     /// Builder for creating SQLManager instances.
     @SuppressWarnings("NullAway.Init") // Builder pattern - fields initialized via setters before build()
     public static final class Builder {
-        private @Nullable DatabaseConfig config;
+        private @Nullable DatabaseCredentials credentials;
+        private int maxPoolSize = 10;
+        private int minIdle = 2;
         private @Nullable String poolName;
         private @Nullable Logger logger;
         private @Nullable Consumer<String> infoLogger;
@@ -440,12 +457,30 @@ public final class SQLManager {
 
         private Builder() {}
 
-        /// Sets the database configuration.
+        /// Sets the database credentials.
         ///
-        /// @param config the database configuration
+        /// @param credentials the database credentials
         /// @return this builder
-        public Builder config(DatabaseConfig config) {
-            this.config = Objects.requireNonNull(config, "config");
+        public Builder credentials(DatabaseCredentials credentials) {
+            this.credentials = Objects.requireNonNull(credentials, "credentials");
+            return this;
+        }
+
+        /// Sets the maximum pool size.
+        ///
+        /// @param maxPoolSize the maximum number of connections in the pool
+        /// @return this builder
+        public Builder maxPoolSize(int maxPoolSize) {
+            this.maxPoolSize = maxPoolSize;
+            return this;
+        }
+
+        /// Sets the minimum idle connections.
+        ///
+        /// @param minIdle the minimum number of idle connections
+        /// @return this builder
+        public Builder minIdle(int minIdle) {
+            this.minIdle = minIdle;
             return this;
         }
 
@@ -494,7 +529,7 @@ public final class SQLManager {
         /// Builds the SQLManager instance.
         ///
         /// @return a new SQLManager
-        /// @throws NullPointerException if config is not set
+        /// @throws NullPointerException if credentials is not set
         public SQLManager build() {
             return new SQLManager(this);
         }
