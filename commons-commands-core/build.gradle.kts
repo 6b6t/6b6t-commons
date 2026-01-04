@@ -7,6 +7,7 @@ description = "StrokkCommands core module for 6b6t plugins - platform-independen
 
 dependencies {
     api(project(":commons-config"))
+    api(project(":commons-message"))
     api(libs.brigadier)
 
     compileOnly(libs.jetbrains.annotations)

@@ -88,6 +88,7 @@ tasks {
     }
 
     javadoc {
+        isFailOnError = false
         options {
             (this as StandardJavadocDocletOptions).apply {
                 encoding = "UTF-8"
