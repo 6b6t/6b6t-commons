@@ -31,6 +31,10 @@ dependencies {
     rewrite("org.openrewrite.recipe:rewrite-migrate-java:3.24.0")
     rewrite("org.openrewrite.recipe:rewrite-testing-frameworks:3.3.0")
 
+    // Immutables
+    annotationProcessor("org.immutables:value:2.12.0")
+    compileOnly("org.immutables:value-annotations:2.12.0")
+
     // Common annotations
     compileOnly("org.jetbrains:annotations:26.0.2")
     compileOnly("com.github.spotbugs:spotbugs-annotations:4.9.8")

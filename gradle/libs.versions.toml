@@ -3,7 +3,7 @@
 java = "25"
 
 # Immutables
-immutables = "2.10.1"
+immutables = "2.12.0"
 
 # Database
 mariadb = "3.5.6"
