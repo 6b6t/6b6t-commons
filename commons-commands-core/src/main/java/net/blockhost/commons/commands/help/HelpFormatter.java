@@ -60,8 +60,7 @@ public final class HelpFormatter {
                 Component line = MINI_MESSAGE.deserialize(
                         config.commandFormat,
                         Placeholder.unparsed("command", entry.command()),
-                        Placeholder.unparsed("description", entry.description())
-                );
+                        Placeholder.unparsed("description", entry.description()));
                 audience.sendMessage(line);
             }
         }
@@ -81,12 +80,13 @@ public final class HelpFormatter {
     ///
     /// @param audience the audience to send the help to
     public void sendMockHelp(Audience audience) {
-        sendHelp(audience, List.of(
-                new CommandEntry("help", "Shows this help message"),
-                new CommandEntry("spawn", "Teleport to spawn point"),
-                new CommandEntry("home", "Teleport to your home"),
-                new CommandEntry("tpa <player>", "Request to teleport to a player")
-        ));
+        sendHelp(
+                audience,
+                List.of(
+                        new CommandEntry("help", "Shows this help message"),
+                        new CommandEntry("spawn", "Teleport to spawn point"),
+                        new CommandEntry("home", "Teleport to your home"),
+                        new CommandEntry("tpa <player>", "Request to teleport to a player")));
     }
 
     /// Represents a command entry in the help listing.

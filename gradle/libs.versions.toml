@@ -62,6 +62,9 @@ paper-api = { module = "io.papermc.paper:paper-api", version.ref = "paper-api" }
 velocity-api = { module = "com.velocitypowered:velocity-api", version.ref = "velocity-api" }
 
 # StrokkCommands
+strokkcommands-annotations-common = { module = "net.strokkur.commands:annotations-common", version.ref = "strokkcommands" }
+strokkcommands-annotations-common-permission = { module = "net.strokkur.commands:annotations-common-permission", version.ref = "strokkcommands" }
+strokkcommands-processor-common = { module = "net.strokkur.commands:processor-common", version.ref = "strokkcommands" }
 strokkcommands-annotations-paper = { module = "net.strokkur.commands:annotations-paper", version.ref = "strokkcommands" }
 strokkcommands-processor-paper = { module = "net.strokkur.commands:processor-paper", version.ref = "strokkcommands" }
 strokkcommands-annotations-velocity = { module = "net.strokkur.commands:annotations-velocity", version.ref = "strokkcommands" }
