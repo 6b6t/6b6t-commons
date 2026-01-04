@@ -112,8 +112,7 @@ public final class RedisManager {
                         config.password(),
                         config.database(),
                         null,
-                        config.ssl()
-                );
+                        config.ssl());
             } else {
                 pool = new JedisPool(
                         poolConfig,
@@ -124,8 +123,7 @@ public final class RedisManager {
                         null,
                         config.database(),
                         null,
-                        config.ssl()
-                );
+                        config.ssl());
             }
 
             // Test connection

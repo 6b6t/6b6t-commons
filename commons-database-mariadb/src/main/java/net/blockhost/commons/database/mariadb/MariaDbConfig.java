@@ -87,7 +87,8 @@ public class MariaDbConfig implements PooledDatabaseConfig {
     /// Converts this configuration to a [DatabaseCredentials] instance.
     ///
     /// This is the recommended way to use the configuration with
-    /// [net.blockhost.commons.database.core.SQLManager] or [net.blockhost.commons.database.core.HikariDataSourceBuilder].
+    /// [net.blockhost.commons.database.core.SQLManager] or
+    // [net.blockhost.commons.database.core.HikariDataSourceBuilder].
     ///
     /// @return a new DatabaseCredentials instance
     @Override

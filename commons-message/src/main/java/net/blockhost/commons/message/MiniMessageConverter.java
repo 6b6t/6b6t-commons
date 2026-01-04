@@ -105,7 +105,8 @@ public final class MiniMessageConverter {
                         hex.append(c);
                     }
                 }
-                uglyHexMatcher.appendReplacement(sb, "<reset><#" + hex.toString().toUpperCase(Locale.ROOT) + ">");
+                uglyHexMatcher.appendReplacement(
+                        sb, "<reset><#" + hex.toString().toUpperCase(Locale.ROOT) + ">");
             }
             uglyHexMatcher.appendTail(sb);
             str = sb.toString();
@@ -119,7 +120,10 @@ public final class MiniMessageConverter {
                 String code = String.valueOf(chars[i + 1]).toLowerCase(Locale.ROOT);
                 String colorReplacement = COLOR_MAP.get(code);
                 if (colorReplacement != null) {
-                    result.append("<reset>").append("<").append(colorReplacement).append(">");
+                    result.append("<reset>")
+                            .append("<")
+                            .append(colorReplacement)
+                            .append(">");
                     i++; // Skip the next character as it's part of the color code
                     continue;
                 } else {

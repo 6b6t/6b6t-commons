@@ -58,7 +58,8 @@ public final class DatabaseCredentials {
 
         /// Sets the JDBC driver class name.
         public DatabaseCredentialsBuilder driverClassName(String driverClassName) {
-            this.driverClassName = Objects.requireNonNull(driverClassName, "driverClassName").trim();
+            this.driverClassName =
+                    Objects.requireNonNull(driverClassName, "driverClassName").trim();
             return this;
         }
 
