@@ -9,10 +9,6 @@ dependencies {
     api(projects.commonsConfig)
     api(libs.hikaricp)
 
-    // Immutables for staged builders
-    compileOnly(libs.immutables.annotations)
-    annotationProcessor(libs.immutables.value)
-
     compileOnly(libs.jetbrains.annotations)
     compileOnly(libs.spotbugs.annotations)
     compileOnly(libs.jspecify)
