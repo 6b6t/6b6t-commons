@@ -25,7 +25,7 @@ paper-api = "1.21.4-R0.1-SNAPSHOT"
 velocity-api = "3.4.0-SNAPSHOT"
 
 # StrokkCommands
-strokkcommands = "2.0.0-SNAPSHOT"
+strokkcommands = "2.0.0"
 brigadier = "1.4.0"
 
 # Annotations
@@ -46,8 +46,6 @@ jedis = { module = "redis.clients:jedis", version.ref = "jedis" }
 
 # ConfigLib
 configlib-yaml = { module = "de.exlll:configlib-yaml", version.ref = "configlib" }
-configlib-paper = { module = "de.exlll:configlib-paper", version.ref = "configlib" }
-configlib-velocity = { module = "de.exlll:configlib-velocity", version.ref = "configlib" }
 
 # SnakeYAML
 snakeyaml = { module = "org.yaml:snakeyaml", version.ref = "snakeyaml" }
@@ -55,7 +53,6 @@ snakeyaml = { module = "org.yaml:snakeyaml", version.ref = "snakeyaml" }
 # Adventure
 adventure-api = { module = "net.kyori:adventure-api", version.ref = "adventure" }
 adventure-text-minimessage = { module = "net.kyori:adventure-text-minimessage", version.ref = "adventure" }
-adventure-platform-bukkit = { module = "net.kyori:adventure-platform-bukkit", version.ref = "adventure-platform" }
 
 # Paper/Velocity API
 paper-api = { module = "io.papermc.paper:paper-api", version.ref = "paper-api" }

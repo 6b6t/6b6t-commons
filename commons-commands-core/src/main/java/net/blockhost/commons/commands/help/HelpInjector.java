@@ -1,7 +1,11 @@
 package net.blockhost.commons.commands.help;
 
 import com.mojang.brigadier.Command;
+import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.context.CommandContext;
 import lombok.experimental.UtilityClass;
+import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.text.Component;
 
 import java.lang.reflect.Method;
 
@@ -18,5 +22,22 @@ public class HelpInjector {
                 command,
                 descriptionAnnotation != null ? descriptionAnnotation.value() : "No description provided.",
                 privateCommandAnnotation != null);
+    }
+
+    public static <S extends Audience> void sendDefaultHelp(CommandContext<S> context) {
+        var source = context.getSource();
+        var command = context.getInput();
+        var dispatcher = new CommandDispatcher<S>();
+        var parseContext = dispatcher.parse(command, source).getContext();
+        if (!parseContext.getNodes().isEmpty()) {
+            var lastNode = parseContext.getNodes().getLast();
+            var smartUsage = dispatcher.getSmartUsage(lastNode.getNode(), source);
+            if (!smartUsage.isEmpty()) {
+                source.sendMessage(Component.text("Did you mean:"));
+                for (var usage : smartUsage.values()) {
+                    source.sendMessage(Component.text("/%s %s".formatted(command, usage)));
+                }
+            }
+        }
     }
 }
