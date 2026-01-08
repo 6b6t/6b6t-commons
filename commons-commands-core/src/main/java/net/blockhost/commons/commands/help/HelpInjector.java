@@ -25,17 +25,19 @@ public class HelpInjector {
 
         return new HelpCommandWrapper<>(
                 command,
-                descriptionAnnotation != null ? descriptionAnnotation.value() : "No description provided.",
+                _ -> Component.text(descriptionAnnotation != null ? descriptionAnnotation.value() : "No description provided."),
                 privateCommandAnnotation != null);
     }
 
     public static <S, A extends Audience> void sendDefaultHelp(CommandContext<S> context, Function<S, A> audienceMapper) {
         var source = context.getSource();
+        var audience = audienceMapper.apply(source);
         var command = context.getInput();
         var root = (RootCommandNode<S>) context.getRootNode();
         var dispatcher = new CommandDispatcher<S>(root);
         var parseContext = dispatcher.parse(command, source).getContext();
         if (parseContext.getNodes().isEmpty()) {
+            audience.sendMessage(Component.text("Invalid command!"));
             return;
         }
 
@@ -43,17 +45,18 @@ public class HelpInjector {
         var lastNode = parseContext.getNodes().getLast();
         var allUsage = getAllUsage(root, lastNode.getNode(), source);
         if (allUsage.isEmpty()) {
+            audience.sendMessage(Component.text("Invalid command!"));
             return;
         }
 
-        var audience = audienceMapper.apply(source);
         audience.sendMessage(Component.text("Invalid command! Did you mean:"));
         for (var usage : allUsage) {
             var helpWrapper = unwrapDelegates(usage.node().getCommand());
             if (helpWrapper.isEmpty() || helpWrapper.get().privateCommand()) {
                 continue;
             }
-            audience.sendMessage(Component.text("/%s %s - %s".formatted(parsedRange, usage.usage, helpWrapper.get().description())));
+            audience.sendMessage(Component.text("/%s %s - ".formatted(parsedRange, usage.usage))
+                    .append(helpWrapper.get().description().apply(source)));
         }
     }
 
