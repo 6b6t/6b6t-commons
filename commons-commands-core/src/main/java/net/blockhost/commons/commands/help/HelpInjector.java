@@ -3,6 +3,7 @@ package net.blockhost.commons.commands.help;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.tree.CommandNode;
 import com.mojang.brigadier.tree.RootCommandNode;
 import lombok.experimental.UtilityClass;
 import net.kyori.adventure.audience.Audience;
@@ -38,21 +39,46 @@ public class HelpInjector {
             return;
         }
 
+        var parsedRange = parseContext.getRange().get(command);
         var lastNode = parseContext.getNodes().getLast();
-        var smartUsage = dispatcher.getSmartUsage(lastNode.getNode(), source);
-        if (smartUsage.isEmpty()) {
+        var allUsage = getAllUsage(root, lastNode.getNode(), source);
+        if (allUsage.isEmpty()) {
             return;
         }
 
         var audience = audienceMapper.apply(source);
         audience.sendMessage(Component.text("Invalid command! Did you mean:"));
-        for (var entries : smartUsage.entrySet()) {
-            var helpWrapper = unwrapDelegates(entries.getKey().getCommand());
+        for (var usage : allUsage) {
+            var helpWrapper = unwrapDelegates(usage.node().getCommand());
             if (helpWrapper.isEmpty() || helpWrapper.get().privateCommand()) {
                 continue;
             }
-            var usage = entries.getValue();
-            audience.sendMessage(Component.text("/%s %s - %s".formatted(command, usage, helpWrapper.get().description())));
+            audience.sendMessage(Component.text("/%s %s - %s".formatted(parsedRange, usage.usage, helpWrapper.get().description())));
+        }
+    }
+
+    private static <S> List<CommandUsage<S>> getAllUsage(final RootCommandNode<S> root, final CommandNode<S> node, final S source) {
+        final List<CommandUsage<S>> result = new ArrayList<>();
+        getAllUsage(root, node, source, result, "");
+        return result;
+    }
+
+    private static <S> void getAllUsage(final RootCommandNode<S> root, final CommandNode<S> node, final S source, final List<CommandUsage<S>> result, final String prefix) {
+        if (!node.canUse(source)) {
+            return;
+        }
+
+        if (node.getCommand() != null) {
+            result.add(new CommandUsage<>(node, prefix));
+        }
+
+        if (node.getRedirect() != null) {
+            final String redirect = Objects.equals(node.getRedirect(), root) ? "..." : "-> " + node.getRedirect().getUsageText();
+            result.add(new CommandUsage<>(node, prefix.isEmpty() ? node.getUsageText() + CommandDispatcher.ARGUMENT_SEPARATOR + redirect : prefix + CommandDispatcher.ARGUMENT_SEPARATOR + redirect));
+        } else if (!node.getChildren().isEmpty()) {
+            for (final CommandNode<S> child : node.getChildren()) {
+                getAllUsage(root, child, source, result, prefix.isEmpty() ? child.getUsageText() : prefix + CommandDispatcher.ARGUMENT_SEPARATOR + child.getUsageText());
+            }
         }
     }
 
@@ -81,4 +107,6 @@ public class HelpInjector {
 
         return Optional.empty();
     }
+
+    private record CommandUsage<S>(CommandNode<S> node, String usage) {}
 }
