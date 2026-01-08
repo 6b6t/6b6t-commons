@@ -47,12 +47,12 @@ public class HelpInjector {
         var audience = audienceMapper.apply(source);
         audience.sendMessage(Component.text("Invalid command! Did you mean:"));
         for (var entries : smartUsage.entrySet()) {
-            var commandNode = entries.getKey();
-            if (!(commandNode.getCommand() instanceof HelpCommandWrapper<?> helpWrapper) || helpWrapper.privateCommand()) {
+            var helpWrapper = unwrapDelegates(entries.getKey().getCommand());
+            if (helpWrapper.isEmpty() || helpWrapper.get().privateCommand()) {
                 continue;
             }
             var usage = entries.getValue();
-            audience.sendMessage(Component.text("/%s %s - %s".formatted(command, usage, helpWrapper.description())));
+            audience.sendMessage(Component.text("/%s %s - %s".formatted(command, usage, helpWrapper.get().description())));
         }
     }
 
