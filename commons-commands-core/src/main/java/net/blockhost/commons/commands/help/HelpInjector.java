@@ -3,11 +3,13 @@ package net.blockhost.commons.commands.help;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.tree.RootCommandNode;
 import lombok.experimental.UtilityClass;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 
 import java.lang.reflect.Method;
+import java.util.*;
 import java.util.function.Function;
 
 @UtilityClass
@@ -28,7 +30,8 @@ public class HelpInjector {
     public static <S, A extends Audience> void sendDefaultHelp(CommandContext<S> context, Function<S, A> audienceMapper) {
         var source = context.getSource();
         var command = context.getInput();
-        var dispatcher = new CommandDispatcher<S>();
+        var root = (RootCommandNode<S>) context.getRootNode();
+        var dispatcher = new CommandDispatcher<S>(root);
         var parseContext = dispatcher.parse(command, source).getContext();
         if (!parseContext.getNodes().isEmpty()) {
             var lastNode = parseContext.getNodes().getLast();
@@ -36,8 +39,13 @@ public class HelpInjector {
             if (!smartUsage.isEmpty()) {
                 var audience = audienceMapper.apply(source);
                 audience.sendMessage(Component.text("Did you mean:"));
-                for (var usage : smartUsage.values()) {
-                    audience.sendMessage(Component.text("/%s %s".formatted(command, usage)));
+                for (var entries : smartUsage.entrySet()) {
+                    var commandNode = entries.getKey();
+                    if (!(commandNode.getCommand() instanceof HelpCommandWrapper<?> helpWrapper) || helpWrapper.privateCommand()) {
+                        continue;
+                    }
+                    var usage = entries.getValue();
+                    audience.sendMessage(Component.text("/%s %s - %s".formatted(command, usage, helpWrapper.description())));
                 }
             }
         }
