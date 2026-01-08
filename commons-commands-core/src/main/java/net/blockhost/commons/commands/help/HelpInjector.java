@@ -8,6 +8,7 @@ import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 
 import java.lang.reflect.Method;
+import java.util.function.Function;
 
 @UtilityClass
 public class HelpInjector {
@@ -24,7 +25,7 @@ public class HelpInjector {
                 privateCommandAnnotation != null);
     }
 
-    public static <S extends Audience> void sendDefaultHelp(CommandContext<S> context) {
+    public static <S, A extends Audience> void sendDefaultHelp(CommandContext<S> context, Function<S, A> audienceMapper) {
         var source = context.getSource();
         var command = context.getInput();
         var dispatcher = new CommandDispatcher<S>();
@@ -33,9 +34,10 @@ public class HelpInjector {
             var lastNode = parseContext.getNodes().getLast();
             var smartUsage = dispatcher.getSmartUsage(lastNode.getNode(), source);
             if (!smartUsage.isEmpty()) {
-                source.sendMessage(Component.text("Did you mean:"));
+                var audience = audienceMapper.apply(source);
+                audience.sendMessage(Component.text("Did you mean:"));
                 for (var usage : smartUsage.values()) {
-                    source.sendMessage(Component.text("/%s %s".formatted(command, usage)));
+                    audience.sendMessage(Component.text("/%s %s".formatted(command, usage)));
                 }
             }
         }
