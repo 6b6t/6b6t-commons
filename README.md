@@ -10,8 +10,6 @@ Common utilities and shared code for 6b6t Minecraft plugins.
 | `commons-config` | ConfigLib YAML configuration utilities | [API Docs](https://6b6t.github.io/6b6t-commons/javadoc/commons-config/) |
 | `commons-message` | MiniMessage formatting and messaging | [API Docs](https://6b6t.github.io/6b6t-commons/javadoc/commons-message/) |
 | `commons-commands-core` | StrokkCommands core with Brigadier | [API Docs](https://6b6t.github.io/6b6t-commons/javadoc/commons-commands-core/) |
-| `commons-commands-bukkit` | StrokkCommands for Bukkit/Paper | [API Docs](https://6b6t.github.io/6b6t-commons/javadoc/commons-commands-bukkit/) |
-| `commons-commands-velocity` | StrokkCommands for Velocity | [API Docs](https://6b6t.github.io/6b6t-commons/javadoc/commons-commands-velocity/) |
 
 ### Database Modules
 
@@ -66,14 +64,6 @@ dependencies {
 
     // Database - Redis
     implementation("net.blockhost:commons-database-redis:1.1.0-SNAPSHOT")
-
-    // Commands - for Bukkit/Paper
-    compileOnly("net.blockhost:commons-commands-bukkit:1.1.0-SNAPSHOT")
-    annotationProcessor("net.strokkur.commands:processor-paper:2.0.0-SNAPSHOT")
-
-    // Commands - for Velocity
-    compileOnly("net.blockhost:commons-commands-velocity:1.1.0-SNAPSHOT")
-    annotationProcessor("net.strokkur.commands:processor-velocity:2.0.0-SNAPSHOT")
 }
 ```
 

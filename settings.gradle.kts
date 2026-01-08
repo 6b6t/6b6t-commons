@@ -30,8 +30,6 @@ include("commons-core")
 include("commons-config")
 include("commons-message")
 include("commons-commands-core")
-include("commons-commands-bukkit")
-include("commons-commands-velocity")
 
 // Database modules
 include("commons-database-core")
