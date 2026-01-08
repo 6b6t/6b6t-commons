@@ -25,7 +25,7 @@ paper-api = "1.21.4-R0.1-SNAPSHOT"
 velocity-api = "3.4.0-SNAPSHOT"
 
 # StrokkCommands
-strokkcommands = "2.0.0"
+strokkcommands = "2.0.1"
 brigadier = "1.4.0"
 
 # Annotations
