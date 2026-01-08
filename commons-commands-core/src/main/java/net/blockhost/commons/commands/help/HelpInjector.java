@@ -33,21 +33,25 @@ public class HelpInjector {
         var root = (RootCommandNode<S>) context.getRootNode();
         var dispatcher = new CommandDispatcher<S>(root);
         var parseContext = dispatcher.parse(command, source).getContext();
-        if (!parseContext.getNodes().isEmpty()) {
-            var lastNode = parseContext.getNodes().getLast();
-            var smartUsage = dispatcher.getSmartUsage(lastNode.getNode(), source);
-            if (!smartUsage.isEmpty()) {
-                var audience = audienceMapper.apply(source);
-                audience.sendMessage(Component.text("Did you mean:"));
-                for (var entries : smartUsage.entrySet()) {
-                    var commandNode = entries.getKey();
-                    if (!(commandNode.getCommand() instanceof HelpCommandWrapper<?> helpWrapper) || helpWrapper.privateCommand()) {
-                        continue;
-                    }
-                    var usage = entries.getValue();
-                    audience.sendMessage(Component.text("/%s %s - %s".formatted(command, usage, helpWrapper.description())));
-                }
+        if (parseContext.getNodes().isEmpty()) {
+            return;
+        }
+
+        var lastNode = parseContext.getNodes().getLast();
+        var smartUsage = dispatcher.getSmartUsage(lastNode.getNode(), source);
+        if (smartUsage.isEmpty()) {
+            return;
+        }
+
+        var audience = audienceMapper.apply(source);
+        audience.sendMessage(Component.text("Invalid command! Did you mean:"));
+        for (var entries : smartUsage.entrySet()) {
+            var commandNode = entries.getKey();
+            if (!(commandNode.getCommand() instanceof HelpCommandWrapper<?> helpWrapper) || helpWrapper.privateCommand()) {
+                continue;
             }
+            var usage = entries.getValue();
+            audience.sendMessage(Component.text("/%s %s - %s".formatted(command, usage, helpWrapper.description())));
         }
     }
 }
