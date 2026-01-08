@@ -7,6 +7,7 @@ import com.mojang.brigadier.tree.RootCommandNode;
 import lombok.experimental.UtilityClass;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
+import org.jspecify.annotations.Nullable;
 
 import java.lang.reflect.Method;
 import java.util.*;
@@ -53,5 +54,31 @@ public class HelpInjector {
             var usage = entries.getValue();
             audience.sendMessage(Component.text("/%s %s - %s".formatted(command, usage, helpWrapper.description())));
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <S> Optional<HelpCommandWrapper<S>> unwrapDelegates(@Nullable Command<S> command) {
+        while (command != null) {
+            if (command instanceof HelpCommandWrapper<S> helpWrapper) {
+                return Optional.of(helpWrapper);
+            }
+
+            var delegateField = Arrays.stream(command.getClass().getDeclaredFields())
+                    .filter(field -> field.getType().isAssignableFrom(Command.class))
+                    .filter(field -> field.getName().equals("delegate"))
+                    .findFirst();
+            if (delegateField.isEmpty()) {
+                break;
+            }
+
+            delegateField.get().setAccessible(true);
+            try {
+                command = (Command<S>) delegateField.get().get(command);
+            } catch (IllegalAccessException e) {
+                break;
+            }
+        }
+
+        return Optional.empty();
     }
 }
