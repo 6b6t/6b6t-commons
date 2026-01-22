@@ -1,5 +1,6 @@
 package net.blockhost.commons.config;
 
+import de.exlll.configlib.NameFormatters;
 import de.exlll.configlib.YamlConfigurationProperties;
 import de.exlll.configlib.YamlConfigurations;
 import lombok.experimental.UtilityClass;
@@ -44,9 +45,7 @@ public class ConfigLoader {
     /// - Preserves existing values in the file
     /// - Removes fields that are no longer in the class
     public <T> T loadOrCreate(Path path, Class<T> configClass) {
-        Objects.requireNonNull(path, "path");
-        Objects.requireNonNull(configClass, "configClass");
-        return YamlConfigurations.update(path, configClass);
+        return loadOrCreate(path, configClass, defaultPropertiesBuilder().build());
     }
 
     /// Loads a configuration with custom properties.
@@ -79,10 +78,7 @@ public class ConfigLoader {
     ///
     /// This will overwrite any existing file at the path.
     public <T> void save(Path path, Class<T> configClass, T config) {
-        Objects.requireNonNull(path, "path");
-        Objects.requireNonNull(configClass, "configClass");
-        Objects.requireNonNull(config, "config");
-        YamlConfigurations.save(path, configClass, config);
+        save(path, configClass, config, defaultPropertiesBuilder().build());
     }
 
     /// Saves a configuration with custom properties.
@@ -101,12 +97,13 @@ public class ConfigLoader {
     public <T> T load(Path path, Class<T> configClass) {
         Objects.requireNonNull(path, "path");
         Objects.requireNonNull(configClass, "configClass");
-        return YamlConfigurations.load(path, configClass);
+        return YamlConfigurations.load(path, configClass, defaultPropertiesBuilder().build());
     }
 
     /// Creates a default properties builder with common settings.
     public YamlConfigurationProperties.Builder<?> defaultPropertiesBuilder() {
-        return YamlConfigurationProperties.newBuilder();
+        return YamlConfigurationProperties.newBuilder()
+                .setNameFormatter(NameFormatters.LOWER_KEBAB_CASE);
     }
 
     /// Updates a configuration file, adding new fields and removing obsolete ones.
@@ -122,7 +119,7 @@ public class ConfigLoader {
         Objects.requireNonNull(path, "path");
         Objects.requireNonNull(configClass, "configClass");
         return updateIfChanged(
-                path, configClass, YamlConfigurationProperties.newBuilder().build());
+                path, configClass, defaultPropertiesBuilder().build());
     }
 
     /// Updates a configuration file with custom properties, only writing if changed.
