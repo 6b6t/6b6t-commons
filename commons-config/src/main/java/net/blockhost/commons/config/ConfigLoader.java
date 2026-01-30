@@ -97,13 +97,13 @@ public class ConfigLoader {
     public <T> T load(Path path, Class<T> configClass) {
         Objects.requireNonNull(path, "path");
         Objects.requireNonNull(configClass, "configClass");
-        return YamlConfigurations.load(path, configClass, defaultPropertiesBuilder().build());
+        return YamlConfigurations.load(
+                path, configClass, defaultPropertiesBuilder().build());
     }
 
     /// Creates a default properties builder with common settings.
     public YamlConfigurationProperties.Builder<?> defaultPropertiesBuilder() {
-        return YamlConfigurationProperties.newBuilder()
-                .setNameFormatter(NameFormatters.LOWER_KEBAB_CASE);
+        return YamlConfigurationProperties.newBuilder().setNameFormatter(NameFormatters.LOWER_KEBAB_CASE);
     }
 
     /// Updates a configuration file, adding new fields and removing obsolete ones.
@@ -118,8 +118,7 @@ public class ConfigLoader {
     public <T> T updateIfChanged(Path path, Class<T> configClass) {
         Objects.requireNonNull(path, "path");
         Objects.requireNonNull(configClass, "configClass");
-        return updateIfChanged(
-                path, configClass, defaultPropertiesBuilder().build());
+        return updateIfChanged(path, configClass, defaultPropertiesBuilder().build());
     }
 
     /// Updates a configuration file with custom properties, only writing if changed.

@@ -25,11 +25,13 @@ public class HelpInjector {
 
         return new HelpCommandWrapper<>(
                 command,
-                _ -> Component.text(descriptionAnnotation != null ? descriptionAnnotation.value() : "No description provided."),
+                _ -> Component.text(
+                        descriptionAnnotation != null ? descriptionAnnotation.value() : "No description provided."),
                 privateCommandAnnotation != null);
     }
 
-    public static <S, A extends Audience> void sendDefaultHelp(CommandContext<S> context, Function<S, A> audienceMapper) {
+    public static <S, A extends Audience> void sendDefaultHelp(
+            CommandContext<S> context, Function<S, A> audienceMapper) {
         var source = context.getSource();
         var audience = audienceMapper.apply(source);
         var command = context.getInput();
@@ -60,13 +62,19 @@ public class HelpInjector {
         }
     }
 
-    private static <S> List<CommandUsage<S>> getAllUsage(final RootCommandNode<S> root, final CommandNode<S> node, final S source) {
+    private static <S> List<CommandUsage<S>> getAllUsage(
+            final RootCommandNode<S> root, final CommandNode<S> node, final S source) {
         final List<CommandUsage<S>> result = new ArrayList<>();
         getAllUsage(root, node, source, result, "");
         return result;
     }
 
-    private static <S> void getAllUsage(final RootCommandNode<S> root, final CommandNode<S> node, final S source, final List<CommandUsage<S>> result, final String prefix) {
+    private static <S> void getAllUsage(
+            final RootCommandNode<S> root,
+            final CommandNode<S> node,
+            final S source,
+            final List<CommandUsage<S>> result,
+            final String prefix) {
         if (!node.canUse(source)) {
             return;
         }
@@ -76,11 +84,24 @@ public class HelpInjector {
         }
 
         if (node.getRedirect() != null) {
-            final String redirect = Objects.equals(node.getRedirect(), root) ? "..." : "-> " + node.getRedirect().getUsageText();
-            result.add(new CommandUsage<>(node, prefix.isEmpty() ? node.getUsageText() + CommandDispatcher.ARGUMENT_SEPARATOR + redirect : prefix + CommandDispatcher.ARGUMENT_SEPARATOR + redirect));
+            final String redirect = Objects.equals(node.getRedirect(), root)
+                    ? "..."
+                    : "-> " + node.getRedirect().getUsageText();
+            result.add(new CommandUsage<>(
+                    node,
+                    prefix.isEmpty()
+                            ? node.getUsageText() + CommandDispatcher.ARGUMENT_SEPARATOR + redirect
+                            : prefix + CommandDispatcher.ARGUMENT_SEPARATOR + redirect));
         } else if (!node.getChildren().isEmpty()) {
             for (final CommandNode<S> child : node.getChildren()) {
-                getAllUsage(root, child, source, result, prefix.isEmpty() ? child.getUsageText() : prefix + CommandDispatcher.ARGUMENT_SEPARATOR + child.getUsageText());
+                getAllUsage(
+                        root,
+                        child,
+                        source,
+                        result,
+                        prefix.isEmpty()
+                                ? child.getUsageText()
+                                : prefix + CommandDispatcher.ARGUMENT_SEPARATOR + child.getUsageText());
             }
         }
     }

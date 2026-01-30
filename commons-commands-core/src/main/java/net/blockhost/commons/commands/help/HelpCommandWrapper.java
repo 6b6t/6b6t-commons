@@ -12,8 +12,10 @@ import java.util.function.Function;
 @RequiredArgsConstructor
 public class HelpCommandWrapper<S> implements Command<S> {
     private final Command<S> delegate;
+
     @Getter
     private final Function<S, Component> description;
+
     @Getter
     private final boolean privateCommand;
 
