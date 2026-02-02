@@ -1,6 +1,7 @@
 package net.blockhost.commons.config.migration;
 
 import lombok.experimental.UtilityClass;
+import net.blockhost.commons.core.io.AtomicFileWriter;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
@@ -145,9 +146,10 @@ public class RawYamlLoader {
         }
     }
 
-    /// Saves YAML data to a file path.
+    /// Saves YAML data to a file path atomically.
     ///
-    /// Creates parent directories if they don't exist. Overwrites any existing file.
+    /// Creates parent directories if they don't exist. Overwrites any existing file
+    /// using an atomic write-to-temp-then-rename strategy to prevent corruption.
     ///
     /// @param path the path to save the YAML file
     /// @param data the data to save
@@ -158,14 +160,7 @@ public class RawYamlLoader {
         Objects.requireNonNull(data, "data");
 
         try {
-            Path parent = path.getParent();
-            if (parent != null && !Files.exists(parent)) {
-                Files.createDirectories(parent);
-            }
-
-            try (OutputStream outputStream = Files.newOutputStream(path)) {
-                save(outputStream, data);
-            }
+            AtomicFileWriter.write(path, out -> save(out, data));
         } catch (IOException e) {
             throw new MigrationException("Failed to write YAML file: " + path, e);
         }

@@ -4,6 +4,7 @@ import de.exlll.configlib.NameFormatters;
 import de.exlll.configlib.YamlConfigurationProperties;
 import de.exlll.configlib.YamlConfigurations;
 import lombok.experimental.UtilityClass;
+import net.blockhost.commons.core.io.AtomicFileWriter;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -161,7 +162,7 @@ public class ConfigLoader {
 
             // Only write if content changed
             if (!Arrays.equals(oldContent, newContent)) {
-                Files.write(path, newContent);
+                AtomicFileWriter.write(path, newContent);
             }
 
             return config;

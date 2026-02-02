@@ -6,6 +6,7 @@ plugins {
 description = "Configuration utilities for 6b6t plugins - ConfigLib integration"
 
 dependencies {
+    api(project(":commons-core"))
     api(libs.configlib.yaml)
     api(libs.snakeyaml)
 }
