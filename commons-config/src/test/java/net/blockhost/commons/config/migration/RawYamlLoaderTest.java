@@ -187,6 +187,6 @@ class RawYamlLoaderTest {
         List<String> items = (List<String>) data.get("items");
         assertNotNull(items);
         assertEquals(3, items.size());
-        assertEquals("first", items.get(0));
+        assertEquals("first", items.getFirst());
     }
 }

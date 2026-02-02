@@ -74,8 +74,7 @@ public final class MiniMessageConverter {
     /// @return the string with legacy codes converted to MiniMessage tags
     public static String convert(String str) {
         str = convertLegacyCodes(str, '&', AMPERSAND_HEX_PATTERN, AMPERSAND_HEX_UGLY_PATTERN);
-        str = convertLegacyCodes(str, '§', SECTION_HEX_PATTERN, SECTION_HEX_UGLY_PATTERN);
-        return str;
+        return convertLegacyCodes(str, '§', SECTION_HEX_PATTERN, SECTION_HEX_UGLY_PATTERN);
     }
 
     private static String convertLegacyCodes(String str, char legacyChar, Pattern hexPattern, Pattern hexUglyPattern) {

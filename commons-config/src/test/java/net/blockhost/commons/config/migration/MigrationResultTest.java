@@ -63,7 +63,7 @@ class MigrationResultTest {
 
     @Test
     void migrationStep_from_createFromMigrationAndTiming() {
-        Migration migration = Migration.of(2, "Test migration", ctx -> {});
+        Migration migration = Migration.of(2, "Test migration", _ -> {});
         Instant start = Instant.now();
         Instant end = start.plusMillis(50);
 
@@ -81,8 +81,8 @@ class MigrationResultTest {
         data.put("version", 1);
 
         MigrationResult.Builder builder = MigrationResult.builder(1, data);
-        Migration m2 = Migration.of(2, "M2", ctx -> {});
-        Migration m3 = Migration.of(3, "M3", ctx -> {});
+        Migration m2 = Migration.of(2, "M2", _ -> {});
+        Migration m3 = Migration.of(3, "M3", _ -> {});
 
         builder.startStep();
         builder.completeStep(m2);
@@ -103,7 +103,7 @@ class MigrationResultTest {
         data.put("version", 1);
 
         MigrationResult.Builder builder = MigrationResult.builder(1, data);
-        Migration m2 = Migration.of(2, "M2", ctx -> {});
+        Migration m2 = Migration.of(2, "M2", _ -> {});
 
         builder.startStep();
         builder.completeStep(m2);
@@ -140,9 +140,8 @@ class MigrationResultTest {
 
         MigrationResult result = MigrationResult.success(1, 2, steps, Duration.ofMillis(10), data);
 
-        assertThrows(UnsupportedOperationException.class, () -> {
-            result.steps().add(new MigrationResult.MigrationStep(2, 3, "M3", Duration.ZERO));
-        });
+        assertThrows(UnsupportedOperationException.class, () -> result.steps()
+                .add(new MigrationResult.MigrationStep(2, 3, "M3", Duration.ZERO)));
     }
 
     @Test

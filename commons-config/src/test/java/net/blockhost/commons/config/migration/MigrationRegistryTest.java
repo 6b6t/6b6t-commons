@@ -25,7 +25,7 @@ class MigrationRegistryTest {
 
     @Test
     void register_addsMigration() {
-        Migration migration = Migration.of(2, "Test migration", ctx -> {});
+        Migration migration = Migration.of(2, "Test migration", _ -> {});
 
         registry.register(migration);
 
@@ -35,8 +35,8 @@ class MigrationRegistryTest {
 
     @Test
     void register_duplicateVersion_throwsException() {
-        Migration first = Migration.of(2, "First", ctx -> {});
-        Migration second = Migration.of(2, "Second", ctx -> {});
+        Migration first = Migration.of(2, "First", _ -> {});
+        Migration second = Migration.of(2, "Second", _ -> {});
 
         registry.register(first);
 
@@ -45,8 +45,8 @@ class MigrationRegistryTest {
 
     @Test
     void registerOrReplace_replacesMigration() {
-        Migration first = Migration.of(2, "First", ctx -> {});
-        Migration second = Migration.of(2, "Second", ctx -> {});
+        Migration first = Migration.of(2, "First", _ -> {});
+        Migration second = Migration.of(2, "Second", _ -> {});
 
         registry.register(first);
         Migration replaced = registry.registerOrReplace(second);
@@ -57,7 +57,7 @@ class MigrationRegistryTest {
 
     @Test
     void get_returnsMigration() {
-        Migration migration = Migration.of(3, "Test", ctx -> {});
+        Migration migration = Migration.of(3, "Test", _ -> {});
         registry.register(migration);
 
         Optional<Migration> found = registry.get(3);
@@ -74,7 +74,7 @@ class MigrationRegistryTest {
 
     @Test
     void remove_removesMigration() {
-        Migration migration = Migration.of(2, "Test", ctx -> {});
+        Migration migration = Migration.of(2, "Test", _ -> {});
         registry.register(migration);
 
         Migration removed = registry.remove(2);
@@ -85,8 +85,8 @@ class MigrationRegistryTest {
 
     @Test
     void clear_removesAllMigrations() {
-        registry.register(Migration.of(2, "M2", ctx -> {}));
-        registry.register(Migration.of(3, "M3", ctx -> {}));
+        registry.register(Migration.of(2, "M2", _ -> {}));
+        registry.register(Migration.of(3, "M3", _ -> {}));
 
         registry.clear();
 
@@ -95,23 +95,23 @@ class MigrationRegistryTest {
 
     @Test
     void getAllMigrations_returnsSortedList() {
-        registry.register(Migration.of(5, "M5", ctx -> {}));
-        registry.register(Migration.of(2, "M2", ctx -> {}));
-        registry.register(Migration.of(3, "M3", ctx -> {}));
+        registry.register(Migration.of(5, "M5", _ -> {}));
+        registry.register(Migration.of(2, "M2", _ -> {}));
+        registry.register(Migration.of(3, "M3", _ -> {}));
 
         List<Migration> all = registry.getAllMigrations();
 
         assertEquals(3, all.size());
-        assertEquals(2, all.get(0).targetVersion());
+        assertEquals(2, all.getFirst().targetVersion());
         assertEquals(3, all.get(1).targetVersion());
         assertEquals(5, all.get(2).targetVersion());
     }
 
     @Test
     void getAllVersions_returnsSortedList() {
-        registry.register(Migration.of(5, "M5", ctx -> {}));
-        registry.register(Migration.of(2, "M2", ctx -> {}));
-        registry.register(Migration.of(3, "M3", ctx -> {}));
+        registry.register(Migration.of(5, "M5", _ -> {}));
+        registry.register(Migration.of(2, "M2", _ -> {}));
+        registry.register(Migration.of(3, "M3", _ -> {}));
 
         List<Integer> versions = registry.getAllVersions();
 
@@ -120,9 +120,9 @@ class MigrationRegistryTest {
 
     @Test
     void getHighestVersion_returnsMaxVersion() {
-        registry.register(Migration.of(2, "M2", ctx -> {}));
-        registry.register(Migration.of(5, "M5", ctx -> {}));
-        registry.register(Migration.of(3, "M3", ctx -> {}));
+        registry.register(Migration.of(2, "M2", _ -> {}));
+        registry.register(Migration.of(5, "M5", _ -> {}));
+        registry.register(Migration.of(3, "M3", _ -> {}));
 
         Optional<Integer> highest = registry.getHighestVersion();
 
@@ -138,9 +138,9 @@ class MigrationRegistryTest {
 
     @Test
     void getLowestVersion_returnsMinVersion() {
-        registry.register(Migration.of(5, "M5", ctx -> {}));
-        registry.register(Migration.of(2, "M2", ctx -> {}));
-        registry.register(Migration.of(3, "M3", ctx -> {}));
+        registry.register(Migration.of(5, "M5", _ -> {}));
+        registry.register(Migration.of(2, "M2", _ -> {}));
+        registry.register(Migration.of(3, "M3", _ -> {}));
 
         Optional<Integer> lowest = registry.getLowestVersion();
 
@@ -150,22 +150,22 @@ class MigrationRegistryTest {
 
     @Test
     void getMigrationsInRange_returnsCorrectMigrations() {
-        registry.register(Migration.of(2, "M2", ctx -> {}));
-        registry.register(Migration.of(3, "M3", ctx -> {}));
-        registry.register(Migration.of(4, "M4", ctx -> {}));
-        registry.register(Migration.of(5, "M5", ctx -> {}));
+        registry.register(Migration.of(2, "M2", _ -> {}));
+        registry.register(Migration.of(3, "M3", _ -> {}));
+        registry.register(Migration.of(4, "M4", _ -> {}));
+        registry.register(Migration.of(5, "M5", _ -> {}));
 
         List<Migration> range = registry.getMigrationsInRange(1, 4);
 
         assertEquals(3, range.size());
-        assertEquals(2, range.get(0).targetVersion());
+        assertEquals(2, range.getFirst().targetVersion());
         assertEquals(3, range.get(1).targetVersion());
         assertEquals(4, range.get(2).targetVersion());
     }
 
     @Test
     void getMigrationsInRange_sameVersion_returnsEmpty() {
-        registry.register(Migration.of(2, "M2", ctx -> {}));
+        registry.register(Migration.of(2, "M2", _ -> {}));
 
         List<Migration> range = registry.getMigrationsInRange(2, 2);
 
@@ -179,8 +179,8 @@ class MigrationRegistryTest {
 
     @Test
     void findMissingMigrations_returnsGaps() {
-        registry.register(Migration.of(2, "M2", ctx -> {}));
-        registry.register(Migration.of(4, "M4", ctx -> {}));
+        registry.register(Migration.of(2, "M2", _ -> {}));
+        registry.register(Migration.of(4, "M4", _ -> {}));
 
         List<Integer> missing = registry.findMissingMigrations(1, 5);
 
@@ -189,9 +189,9 @@ class MigrationRegistryTest {
 
     @Test
     void findMissingMigrations_noGaps_returnsEmpty() {
-        registry.register(Migration.of(2, "M2", ctx -> {}));
-        registry.register(Migration.of(3, "M3", ctx -> {}));
-        registry.register(Migration.of(4, "M4", ctx -> {}));
+        registry.register(Migration.of(2, "M2", _ -> {}));
+        registry.register(Migration.of(3, "M3", _ -> {}));
+        registry.register(Migration.of(4, "M4", _ -> {}));
 
         List<Integer> missing = registry.findMissingMigrations(1, 4);
 
@@ -200,24 +200,24 @@ class MigrationRegistryTest {
 
     @Test
     void hasCompleteMigrationChain_withGaps_returnsFalse() {
-        registry.register(Migration.of(2, "M2", ctx -> {}));
-        registry.register(Migration.of(4, "M4", ctx -> {}));
+        registry.register(Migration.of(2, "M2", _ -> {}));
+        registry.register(Migration.of(4, "M4", _ -> {}));
 
         assertFalse(registry.hasCompleteMigrationChain(1, 4));
     }
 
     @Test
     void hasCompleteMigrationChain_complete_returnsTrue() {
-        registry.register(Migration.of(2, "M2", ctx -> {}));
-        registry.register(Migration.of(3, "M3", ctx -> {}));
+        registry.register(Migration.of(2, "M2", _ -> {}));
+        registry.register(Migration.of(3, "M3", _ -> {}));
 
         assertTrue(registry.hasCompleteMigrationChain(1, 3));
     }
 
     @Test
     void of_varargs_createsPopulatedRegistry() {
-        Migration m2 = Migration.of(2, "M2", ctx -> {});
-        Migration m3 = Migration.of(3, "M3", ctx -> {});
+        Migration m2 = Migration.of(2, "M2", _ -> {});
+        Migration m3 = Migration.of(3, "M3", _ -> {});
 
         MigrationRegistry populated = MigrationRegistry.of(m2, m3);
 
@@ -229,28 +229,28 @@ class MigrationRegistryTest {
     @Test
     void registerAll_addsMultipleMigrations() {
         registry.registerAll(
-                Migration.of(2, "M2", ctx -> {}), Migration.of(3, "M3", ctx -> {}), Migration.of(4, "M4", ctx -> {}));
+                Migration.of(2, "M2", _ -> {}), Migration.of(3, "M3", _ -> {}), Migration.of(4, "M4", _ -> {}));
 
         assertEquals(3, registry.size());
     }
 
     @Test
     void immutableCopy_returnsUnmodifiableCopy() {
-        registry.register(Migration.of(2, "M2", ctx -> {}));
+        registry.register(Migration.of(2, "M2", _ -> {}));
 
         MigrationRegistry copy = registry.immutableCopy();
 
         assertEquals(1, copy.size());
         // Original can still be modified
-        registry.register(Migration.of(3, "M3", ctx -> {}));
+        registry.register(Migration.of(3, "M3", _ -> {}));
         assertEquals(1, copy.size());
         assertEquals(2, registry.size());
     }
 
     @Test
     void toString_includesVersions() {
-        registry.register(Migration.of(2, "M2", ctx -> {}));
-        registry.register(Migration.of(3, "M3", ctx -> {}));
+        registry.register(Migration.of(2, "M2", _ -> {}));
+        registry.register(Migration.of(3, "M3", _ -> {}));
 
         String str = registry.toString();
 

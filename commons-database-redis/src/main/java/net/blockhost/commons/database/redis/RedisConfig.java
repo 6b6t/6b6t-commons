@@ -46,7 +46,7 @@ public class RedisConfig {
     private String password = "";
 
     @Comment("The Redis database index (0-15)")
-    private int database = 0;
+    private int database;
 
     @Comment("Connection timeout in milliseconds")
     private int connectionTimeoutMs = 2000;
@@ -61,10 +61,10 @@ public class RedisConfig {
     private int maxIdle = 8;
 
     @Comment("Minimum number of idle connections in the pool")
-    private int minIdle = 0;
+    private int minIdle;
 
     @Comment("Enable SSL/TLS connection")
-    private boolean ssl = false;
+    private boolean ssl;
 
     /// Checks if authentication is required.
     ///

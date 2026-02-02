@@ -115,7 +115,7 @@ public class HelpInjector {
 
             var delegateField = Arrays.stream(command.getClass().getDeclaredFields())
                     .filter(field -> field.getType().isAssignableFrom(Command.class))
-                    .filter(field -> field.getName().equals("delegate"))
+                    .filter(field -> "delegate".equals(field.getName()))
                     .findFirst();
             if (delegateField.isEmpty()) {
                 break;
@@ -124,7 +124,7 @@ public class HelpInjector {
             delegateField.get().setAccessible(true);
             try {
                 command = (Command<S>) delegateField.get().get(command);
-            } catch (IllegalAccessException e) {
+            } catch (IllegalAccessException _) {
                 break;
             }
         }

@@ -3,6 +3,8 @@ package net.blockhost.commons.config.migration;
 import org.jspecify.annotations.Nullable;
 
 import java.nio.file.Path;
+import java.time.Duration;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -61,7 +63,7 @@ public final class MigrationExecutor {
 
     private final MigrationRegistry registry;
     private boolean strictMode = true;
-    private boolean dryRun = false;
+    private boolean dryRun;
     private @Nullable Consumer<Migration> beforeMigrationCallback;
     private @Nullable MigrationCallback afterMigrationCallback;
     private @Nullable Consumer<MigrationException> errorCallback;
@@ -154,7 +156,7 @@ public final class MigrationExecutor {
                     fromVersion,
                     fromVersion,
                     List.of(),
-                    java.time.Duration.ZERO,
+                    Duration.ZERO,
                     data,
                     MigrationException.invalidVersionRange(fromVersion, toVersion));
         }
@@ -170,7 +172,7 @@ public final class MigrationExecutor {
                         fromVersion,
                         fromVersion,
                         List.of(),
-                        java.time.Duration.ZERO,
+                        Duration.ZERO,
                         data,
                         new MigrationException("Missing migrations for versions: " + missing));
             }
@@ -259,7 +261,7 @@ public final class MigrationExecutor {
         if (beforeMigrationCallback != null) {
             try {
                 beforeMigrationCallback.accept(migration);
-            } catch (Exception ignored) {
+            } catch (Exception _) {
                 // Callbacks should not throw, but don't let them break migrations
             }
         }
@@ -269,7 +271,7 @@ public final class MigrationExecutor {
         if (afterMigrationCallback != null) {
             try {
                 afterMigrationCallback.onMigrationComplete(migration, context);
-            } catch (Exception ignored) {
+            } catch (Exception _) {
                 // Callbacks should not throw
             }
         }
@@ -279,7 +281,7 @@ public final class MigrationExecutor {
         if (errorCallback != null) {
             try {
                 errorCallback.accept(error);
-            } catch (Exception ignored) {
+            } catch (Exception _) {
                 // Callbacks should not throw
             }
         }
@@ -287,7 +289,7 @@ public final class MigrationExecutor {
 
     @SuppressWarnings("unchecked")
     private Map<String, Object> deepCopy(Map<String, Object> original) {
-        java.util.LinkedHashMap<String, Object> copy = new java.util.LinkedHashMap<>();
+        LinkedHashMap<String, Object> copy = new LinkedHashMap<>();
         for (Map.Entry<String, Object> entry : original.entrySet()) {
             Object value = entry.getValue();
             if (value instanceof Map<?, ?> map) {

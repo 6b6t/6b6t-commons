@@ -11,8 +11,10 @@ import org.yaml.snakeyaml.representer.Representer;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.LinkedHashMap;
@@ -180,7 +182,7 @@ public class RawYamlLoader {
 
         try {
             Yaml yaml = createYaml();
-            yaml.dump(data, new java.io.OutputStreamWriter(outputStream, java.nio.charset.StandardCharsets.UTF_8));
+            yaml.dump(data, new OutputStreamWriter(outputStream, StandardCharsets.UTF_8));
         } catch (Exception e) {
             throw new MigrationException("Failed to serialize YAML content", e);
         }

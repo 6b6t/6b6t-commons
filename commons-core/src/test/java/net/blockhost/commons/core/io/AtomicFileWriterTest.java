@@ -3,6 +3,7 @@ package net.blockhost.commons.core.io;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -172,12 +173,12 @@ class AtomicFileWriterTest {
     @Test
     void write_consumer_nullPath_throwsNullPointerException() {
         assertThrows(
-                NullPointerException.class, () -> AtomicFileWriter.write(null, (IOConsumer<java.io.OutputStream>) out -> {}));
+                NullPointerException.class, () -> AtomicFileWriter.write(null, _ -> {}));
     }
 
     @Test
     void write_consumer_nullWriter_throwsNullPointerException() {
         Path file = tempDir.resolve("test.txt");
-        assertThrows(NullPointerException.class, () -> AtomicFileWriter.write(file, (IOConsumer<java.io.OutputStream>) null));
+        assertThrows(NullPointerException.class, () -> AtomicFileWriter.write(file, (IOConsumer<OutputStream>) null));
     }
 }

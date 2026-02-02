@@ -67,12 +67,16 @@ public final class RedisManager {
         this.infoLogger = builder.infoLogger != null
                 ? builder.infoLogger
                 : msg -> {
-                    if (logger != null) logger.info(msg);
+                    if (logger != null) {
+                        logger.info(msg);
+                    }
                 };
         this.warningLogger = builder.warningLogger != null
                 ? builder.warningLogger
                 : msg -> {
-                    if (logger != null) logger.warning(msg);
+                    if (logger != null) {
+                        logger.warning(msg);
+                    }
                 };
     }
 

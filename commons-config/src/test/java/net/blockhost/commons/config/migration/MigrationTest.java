@@ -11,9 +11,8 @@ class MigrationTest {
 
     @Test
     void of_withTargetVersion_createsValidMigration() {
-        Migration migration = Migration.of(3, "Test migration", ctx -> {
-            ctx.data().put("migrated", true);
-        });
+        Migration migration =
+                Migration.of(3, "Test migration", ctx -> ctx.data().put("migrated", true));
 
         assertEquals(3, migration.targetVersion());
         assertEquals(2, migration.sourceVersion());
@@ -22,7 +21,7 @@ class MigrationTest {
 
     @Test
     void of_withSourceAndTargetVersion_createsValidMigration() {
-        Migration migration = Migration.of(1, 5, "Skip versions", ctx -> {});
+        Migration migration = Migration.of(1, 5, "Skip versions", _ -> {});
 
         assertEquals(1, migration.sourceVersion());
         assertEquals(5, migration.targetVersion());
@@ -35,9 +34,7 @@ class MigrationTest {
         data.put("version", 1);
         MigrationContext context = MigrationContext.ofData(data, 1, 2);
 
-        Migration migration = Migration.of(2, "Add field", ctx -> {
-            ctx.data().put("newField", "value");
-        });
+        Migration migration = Migration.of(2, "Add field", ctx -> ctx.data().put("newField", "value"));
 
         migration.migrate(context);
 
@@ -46,7 +43,7 @@ class MigrationTest {
 
     @Test
     void defaultSourceVersion_isTargetMinusOne() {
-        Migration migration = Migration.of(5, "Test", ctx -> {});
+        Migration migration = Migration.of(5, "Test", _ -> {});
 
         assertEquals(4, migration.sourceVersion());
     }
@@ -115,7 +112,7 @@ class MigrationTest {
     void of_migrationActionIsExecuted() {
         boolean[] executed = {false};
 
-        Migration migration = Migration.of(2, "Test", ctx -> {
+        Migration migration = Migration.of(2, "Test", _ -> {
             executed[0] = true;
         });
 
@@ -128,16 +125,14 @@ class MigrationTest {
 
     @Test
     void migrate_canThrowMigrationException() {
-        Migration migration = Migration.of(2, "Failing migration", ctx -> {
+        Migration migration = Migration.of(2, "Failing migration", _ -> {
             throw new MigrationException("Expected failure");
         });
 
         Map<String, Object> data = new LinkedHashMap<>();
         MigrationContext context = MigrationContext.ofData(data, 1, 2);
 
-        MigrationException ex = assertThrows(MigrationException.class, () -> {
-            migration.migrate(context);
-        });
+        MigrationException ex = assertThrows(MigrationException.class, () -> migration.migrate(context));
 
         assertEquals("Expected failure", ex.getMessage());
     }
@@ -148,9 +143,7 @@ class MigrationTest {
         data.put("oldField", "oldValue");
         MigrationContext context = MigrationContext.ofData(data, 1, 2);
 
-        Migration migration = Migration.of(2, "Rename field", ctx -> {
-            ctx.rename("oldField", "newField");
-        });
+        Migration migration = Migration.of(2, "Rename field", ctx -> ctx.rename("oldField", "newField"));
 
         migration.migrate(context);
 

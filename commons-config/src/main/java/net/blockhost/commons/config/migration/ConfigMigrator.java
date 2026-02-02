@@ -10,6 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
 import java.util.Objects;
@@ -323,8 +324,7 @@ public final class ConfigMigrator {
 
             String backupName;
             if (useTimestampedBackups) {
-                String timestamp =
-                        LocalDateTime.now(java.time.ZoneId.systemDefault()).format(BACKUP_TIMESTAMP_FORMAT);
+                String timestamp = LocalDateTime.now(ZoneId.systemDefault()).format(BACKUP_TIMESTAMP_FORMAT);
                 int dotIndex = fileName.lastIndexOf('.');
                 if (dotIndex > 0) {
                     backupName = fileName.substring(0, dotIndex) + "-" + timestamp + fileName.substring(dotIndex)
@@ -350,9 +350,9 @@ public final class ConfigMigrator {
 
         private final MigrationRegistry registry = MigrationRegistry.create();
         private boolean strictMode = true;
-        private boolean createBackups = false;
+        private boolean createBackups;
         private String backupSuffix = ".bak";
-        private boolean useTimestampedBackups = false;
+        private boolean useTimestampedBackups;
         private @Nullable Consumer<Migration> beforeMigrationCallback;
         private MigrationExecutor.@Nullable MigrationCallback afterMigrationCallback;
         private @Nullable Consumer<MigrationException> errorCallback;

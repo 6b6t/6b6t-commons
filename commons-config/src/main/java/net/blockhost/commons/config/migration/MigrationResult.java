@@ -4,6 +4,7 @@ import org.jspecify.annotations.Nullable;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -223,14 +224,14 @@ public sealed interface MigrationResult {
 
         private final int fromVersion;
         private final Map<String, Object> data;
-        private final java.util.ArrayList<MigrationStep> steps;
+        private final ArrayList<MigrationStep> steps;
         private final Instant startTime;
         private @Nullable Instant stepStartTime;
 
         private Builder(int fromVersion, Map<String, Object> data) {
             this.fromVersion = fromVersion;
             this.data = data;
-            this.steps = new java.util.ArrayList<>();
+            this.steps = new ArrayList<>();
             this.startTime = Instant.now();
         }
 
