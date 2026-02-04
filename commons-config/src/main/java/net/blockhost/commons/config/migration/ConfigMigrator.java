@@ -4,8 +4,10 @@ import de.exlll.configlib.YamlConfigurationProperties;
 import de.exlll.configlib.YamlConfigurations;
 import net.blockhost.commons.config.ConfigLoader;
 import net.blockhost.commons.config.VersionAwareConfiguration;
+import net.blockhost.commons.core.text.ConfigSubstitutor;
 import org.jspecify.annotations.Nullable;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -108,6 +110,7 @@ public final class ConfigMigrator {
     private final boolean createBackups;
     private final String backupSuffix;
     private final boolean useTimestampedBackups;
+    private final boolean enableSubstitution;
 
     private ConfigMigrator(Builder builder) {
         this.registry = builder.registry;
@@ -119,6 +122,7 @@ public final class ConfigMigrator {
         this.createBackups = builder.createBackups;
         this.backupSuffix = builder.backupSuffix;
         this.useTimestampedBackups = builder.useTimestampedBackups;
+        this.enableSubstitution = builder.enableSubstitution;
     }
 
     /// Creates a new migrator builder.
@@ -142,9 +146,11 @@ public final class ConfigMigrator {
     /// 1. Loads the raw YAML data
     /// 2. Reads the current version
     /// 3. Applies necessary migrations
-    /// 4. Saves the migrated data
+    /// 4. Saves the migrated data (unsubstituted)
     /// 5. Syncs the configuration (adds new fields, removes obsolete ones)
     /// 6. Loads the configuration using ConfigLib
+    /// 7. If substitution is enabled, resolves `${env:...}` and `${sys:...}` patterns
+    ///    in memory without writing substituted values to disk
     ///
     /// The sync step ensures that even if a migration is imperfect, any new fields
     /// added to the Java class will be written to the file with their default values.
@@ -172,9 +178,16 @@ public final class ConfigMigrator {
             throw result.error().orElseGet(() -> new MigrationException("Migration failed with unknown error"));
         }
 
-        // Load and sync the configuration - adds new fields, removes obsolete ones
-        // Only writes to disk if content actually changed
-        return ConfigLoader.updateIfChanged(path, configClass);
+        // Sync the configuration on disk - adds new fields, removes obsolete ones
+        // Only writes to disk if content actually changed (always unsubstituted)
+        ConfigLoader.updateIfChanged(path, configClass);
+
+        // If substitution is enabled, load a substituted version in memory
+        if (enableSubstitution) {
+            return loadWithSubstitution(path, configClass, ConfigLoader.defaultPropertiesBuilder().build());
+        }
+
+        return ConfigLoader.load(path, configClass);
     }
 
     /// Migrates a configuration file to the target version and loads it with custom properties.
@@ -202,9 +215,15 @@ public final class ConfigMigrator {
             throw result.error().orElseGet(() -> new MigrationException("Migration failed with unknown error"));
         }
 
-        // Load and sync the configuration - adds new fields, removes obsolete ones
-        // Only writes to disk if content actually changed
-        return ConfigLoader.updateIfChanged(path, configClass, properties);
+        // Sync the configuration on disk (always unsubstituted)
+        ConfigLoader.updateIfChanged(path, configClass, properties);
+
+        // If substitution is enabled, load a substituted version in memory
+        if (enableSubstitution) {
+            return loadWithSubstitution(path, configClass, properties);
+        }
+
+        return ConfigLoader.load(path, configClass);
     }
 
     /// Migrates a configuration file to the target version.
@@ -314,6 +333,28 @@ public final class ConfigMigrator {
         return registry;
     }
 
+    /// Loads a configuration with `${env:...}` and `${sys:...}` substitution applied.
+    ///
+    /// Reads the on-disk YAML, applies substitution, writes to a temporary file,
+    /// loads the typed config from the temp file, then deletes the temp file.
+    /// The original file on disk is never modified.
+    private <T> T loadWithSubstitution(Path path, Class<T> configClass, YamlConfigurationProperties properties) {
+        try {
+            String content = Files.readString(path);
+            String substituted = ConfigSubstitutor.substitute(content);
+
+            Path tempFile = Files.createTempFile("config-substituted-", ".yml");
+            try {
+                Files.writeString(tempFile, substituted);
+                return YamlConfigurations.load(tempFile, configClass, properties);
+            } finally {
+                Files.deleteIfExists(tempFile);
+            }
+        } catch (IOException e) {
+            throw new MigrationException("Failed to load configuration with substitution: " + path, e);
+        }
+    }
+
     private void createBackup(Path path) {
         try {
             Path fileNamePath = path.getFileName();
@@ -353,6 +394,7 @@ public final class ConfigMigrator {
         private boolean createBackups;
         private String backupSuffix = ".bak";
         private boolean useTimestampedBackups;
+        private boolean enableSubstitution;
         private @Nullable Consumer<Migration> beforeMigrationCallback;
         private MigrationExecutor.@Nullable MigrationCallback afterMigrationCallback;
         private @Nullable Consumer<MigrationException> errorCallback;
@@ -374,6 +416,19 @@ public final class ConfigMigrator {
         /// @return this builder
         public Builder registerAll(Migration... migrations) {
             registry.registerAll(migrations);
+            return this;
+        }
+
+        /// Enables or disables environment variable and system property substitution.
+        ///
+        /// When enabled, `${env:VAR_NAME}` and `${sys:property.name}` patterns in
+        /// configuration values are resolved after migration and schema sync, but
+        /// substituted values are never written back to disk.
+        ///
+        /// @param enable true to enable substitution
+        /// @return this builder
+        public Builder enableSubstitution(boolean enable) {
+            this.enableSubstitution = enable;
             return this;
         }
 

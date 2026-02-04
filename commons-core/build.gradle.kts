@@ -6,4 +6,5 @@ plugins {
 description = "Core utilities for 6b6t plugins"
 
 dependencies {
+    api(libs.commons.text)
 }
