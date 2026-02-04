@@ -184,7 +184,8 @@ public final class ConfigMigrator {
 
         // If substitution is enabled, load a substituted version in memory
         if (enableSubstitution) {
-            return loadWithSubstitution(path, configClass, ConfigLoader.defaultPropertiesBuilder().build());
+            return loadWithSubstitution(
+                    path, configClass, ConfigLoader.defaultPropertiesBuilder().build());
         }
 
         return ConfigLoader.load(path, configClass);

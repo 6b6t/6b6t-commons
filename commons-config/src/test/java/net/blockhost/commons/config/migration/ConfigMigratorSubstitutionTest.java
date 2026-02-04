@@ -52,9 +52,8 @@ class ConfigMigratorSubstitutionTest {
                 label: static-value
                 """);
 
-        ConfigMigrator migrator = ConfigMigrator.builder()
-                .enableSubstitution(true)
-                .build();
+        ConfigMigrator migrator =
+                ConfigMigrator.builder().enableSubstitution(true).build();
 
         TestConfig config = migrator.migrateAndLoad(configFile, TestConfig.class, 1);
 
@@ -73,15 +72,15 @@ class ConfigMigratorSubstitutionTest {
                 label: keep-this
                 """);
 
-        ConfigMigrator migrator = ConfigMigrator.builder()
-                .enableSubstitution(true)
-                .build();
+        ConfigMigrator migrator =
+                ConfigMigrator.builder().enableSubstitution(true).build();
 
         migrator.migrateAndLoad(configFile, TestConfig.class, 1);
 
         // Verify the file on disk still has the unsubstituted pattern
         String fileContent = Files.readString(configFile);
-        assertTrue(fileContent.contains("${sys:os.name}"),
+        assertTrue(
+                fileContent.contains("${sys:os.name}"),
                 "File on disk should contain the unsubstituted pattern, but was:\n" + fileContent);
     }
 
@@ -95,9 +94,8 @@ class ConfigMigratorSubstitutionTest {
                 label: test
                 """);
 
-        ConfigMigrator migrator = ConfigMigrator.builder()
-                .enableSubstitution(false)
-                .build();
+        ConfigMigrator migrator =
+                ConfigMigrator.builder().enableSubstitution(false).build();
 
         TestConfig config = migrator.migrateAndLoad(configFile, TestConfig.class, 1);
 
@@ -154,9 +152,9 @@ class ConfigMigratorSubstitutionTest {
 
         // Verify disk state: migrated but NOT substituted
         String fileContent = Files.readString(configFile);
-        assertTrue(fileContent.contains("${sys:os.name}"),
-                "File on disk should still contain the pattern");
-        assertTrue(fileContent.contains("version: 2") || fileContent.contains("version:2"),
+        assertTrue(fileContent.contains("${sys:os.name}"), "File on disk should still contain the pattern");
+        assertTrue(
+                fileContent.contains("version: 2") || fileContent.contains("version:2"),
                 "File on disk should have the migrated version");
     }
 
@@ -170,9 +168,8 @@ class ConfigMigratorSubstitutionTest {
                 label: test
                 """);
 
-        ConfigMigrator migrator = ConfigMigrator.builder()
-                .enableSubstitution(true)
-                .build();
+        ConfigMigrator migrator =
+                ConfigMigrator.builder().enableSubstitution(true).build();
 
         TestConfig config = migrator.migrateAndLoad(configFile, TestConfig.class, 1);
 
@@ -184,9 +181,8 @@ class ConfigMigratorSubstitutionTest {
     void migrateAndLoad_newFile_withSubstitution_createsDefaults() {
         Path configFile = tempDir.resolve("nonexistent.yml");
 
-        ConfigMigrator migrator = ConfigMigrator.builder()
-                .enableSubstitution(true)
-                .build();
+        ConfigMigrator migrator =
+                ConfigMigrator.builder().enableSubstitution(true).build();
 
         // Should create with defaults without error
         TestConfig config = migrator.migrateAndLoad(configFile, TestConfig.class, 1);

@@ -72,8 +72,7 @@ class ConfigSubstitutorTest {
         String javaVersion = System.getProperty("java.version");
         String osName = System.getProperty("os.name");
 
-        String result = ConfigSubstitutor.substitute(
-                "java: ${sys:java.version}, os: ${sys:os.name}");
+        String result = ConfigSubstitutor.substitute("java: ${sys:java.version}, os: ${sys:os.name}");
 
         assertEquals("java: " + javaVersion + ", os: " + osName, result);
     }

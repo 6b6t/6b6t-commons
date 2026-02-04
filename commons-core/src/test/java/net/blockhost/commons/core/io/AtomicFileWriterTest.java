@@ -172,8 +172,7 @@ class AtomicFileWriterTest {
 
     @Test
     void write_consumer_nullPath_throwsNullPointerException() {
-        assertThrows(
-                NullPointerException.class, () -> AtomicFileWriter.write(null, _ -> {}));
+        assertThrows(NullPointerException.class, () -> AtomicFileWriter.write(null, _ -> {}));
     }
 
     @Test
