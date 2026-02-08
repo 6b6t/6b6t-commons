@@ -99,24 +99,24 @@ class ConfigSubstitutorTest {
 
     @Test
     void substituteValues_resolvesStringValuesInMap() {
-        String javaVersion = System.getProperty("java.version");
+        String osName = System.getProperty("os.name");
         Map<String, Object> data = new LinkedHashMap<>();
-        data.put("version", "${sys:java.version}");
+        data.put("os", "${sys:os.name}");
         data.put("count", 42);
         data.put("enabled", true);
 
         Map<String, Object> result = ConfigSubstitutor.substituteValues(data);
 
-        assertEquals(javaVersion, result.get("version"));
+        assertEquals(osName, result.get("os"));
         assertEquals(42, result.get("count"));
         assertEquals(true, result.get("enabled"));
     }
 
     @Test
     void substituteValues_resolvesNestedMaps() {
-        String javaVersion = System.getProperty("java.version");
+        String osName = System.getProperty("os.name");
         Map<String, Object> nested = new LinkedHashMap<>();
-        nested.put("java-version", "${sys:java.version}");
+        nested.put("os-name", "${sys:os.name}");
         nested.put("port", 3306);
 
         Map<String, Object> data = new LinkedHashMap<>();
@@ -126,23 +126,24 @@ class ConfigSubstitutorTest {
 
         @SuppressWarnings("unchecked")
         Map<String, Object> resultNested = (Map<String, Object>) result.get("database");
-        assertEquals(javaVersion, resultNested.get("java-version"));
+        assertEquals(osName, resultNested.get("os-name"));
         assertEquals(3306, resultNested.get("port"));
     }
 
     @Test
     void substituteValues_resolvesValuesInLists() {
-        String javaVersion = System.getProperty("java.version");
+        String osName = System.getProperty("os.name");
+        String userDir = System.getProperty("user.dir");
         Map<String, Object> data = new LinkedHashMap<>();
-        data.put("items", List.of("${sys:java.version}", "literal", "${sys:os.name}"));
+        data.put("items", List.of("${sys:os.name}", "literal", "${sys:user.dir}"));
 
         Map<String, Object> result = ConfigSubstitutor.substituteValues(data);
 
         @SuppressWarnings("unchecked")
-        List<String> items = (List<String>) result.get("items");
-        assertEquals(javaVersion, items.get(0));
+        List<Object> items = (List<Object>) result.get("items");
+        assertEquals(osName, items.get(0));
         assertEquals("literal", items.get(1));
-        assertEquals(System.getProperty("os.name"), items.get(2));
+        assertEquals(userDir, items.get(2));
     }
 
     @Test
