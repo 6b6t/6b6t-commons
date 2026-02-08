@@ -1,7 +1,6 @@
 package net.blockhost.commons.config.migration;
 
 import de.exlll.configlib.YamlConfigurationProperties;
-import de.exlll.configlib.YamlConfigurations;
 import net.blockhost.commons.config.ConfigLoader;
 import net.blockhost.commons.config.VersionAwareConfiguration;
 import org.jspecify.annotations.Nullable;
@@ -163,9 +162,19 @@ public final class ConfigMigrator {
         Objects.requireNonNull(path, "path");
         Objects.requireNonNull(configClass, "configClass");
 
+        var defaultProps = ConfigLoader.defaultPropertiesBuilder().build();
+
         // If file doesn't exist, just create with defaults
         if (!Files.exists(path)) {
-            return ConfigLoader.loadOrCreate(path, configClass);
+            if (envPrefix != null) {
+                // Write defaults to disk without env var resolution, then load with it
+                ConfigLoader.loadOrCreate(path, configClass, defaultProps);
+                return ConfigLoader.load(
+                        path,
+                        configClass,
+                        ConfigLoader.defaultPropertiesBuilder(envPrefix).build());
+            }
+            return ConfigLoader.loadOrCreate(path, configClass, defaultProps);
         }
 
         // Load raw data and migrate
@@ -177,14 +186,17 @@ public final class ConfigMigrator {
 
         // Sync the configuration on disk - adds new fields, removes obsolete ones
         // Only writes to disk if content actually changed
-        ConfigLoader.updateIfChanged(path, configClass);
+        ConfigLoader.updateIfChanged(path, configClass, defaultProps);
 
         // If env prefix is set, load with env var resolution
         if (envPrefix != null) {
-            return ConfigLoader.load(path, configClass, envPrefix);
+            return ConfigLoader.load(
+                    path,
+                    configClass,
+                    ConfigLoader.defaultPropertiesBuilder(envPrefix).build());
         }
 
-        return ConfigLoader.load(path, configClass);
+        return ConfigLoader.load(path, configClass, defaultProps);
     }
 
     /// Migrates a configuration file to the target version and loads it with custom properties.
@@ -203,7 +215,14 @@ public final class ConfigMigrator {
         Objects.requireNonNull(properties, "properties");
 
         if (!Files.exists(path)) {
-            return YamlConfigurations.update(path, configClass, properties);
+            ConfigLoader.loadOrCreate(path, configClass, properties);
+            if (envPrefix != null) {
+                return ConfigLoader.load(
+                        path,
+                        configClass,
+                        ConfigLoader.defaultPropertiesBuilder(envPrefix).build());
+            }
+            return ConfigLoader.load(path, configClass, properties);
         }
 
         MigrationResult result = migrate(path, targetVersion);
@@ -217,10 +236,13 @@ public final class ConfigMigrator {
 
         // If env prefix is set, load with env var resolution
         if (envPrefix != null) {
-            return ConfigLoader.load(path, configClass, envPrefix);
+            return ConfigLoader.load(
+                    path,
+                    configClass,
+                    ConfigLoader.defaultPropertiesBuilder(envPrefix).build());
         }
 
-        return ConfigLoader.load(path, configClass);
+        return ConfigLoader.load(path, configClass, properties);
     }
 
     /// Migrates a configuration file to the target version.

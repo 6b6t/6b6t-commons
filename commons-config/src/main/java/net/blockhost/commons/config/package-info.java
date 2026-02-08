@@ -35,7 +35,8 @@
 ///
 /// ```java
 /// Path configPath = plugin.getDataFolder().toPath().resolve("config.yml");
-/// MyPluginConfig config = ConfigLoader.loadOrCreate(configPath, MyPluginConfig.class);
+/// var properties = ConfigLoader.defaultPropertiesBuilder().build();
+/// MyPluginConfig config = ConfigLoader.loadOrCreate(configPath, MyPluginConfig.class, properties);
 /// ```
 ///
 /// ### Versioned Configuration with Migration

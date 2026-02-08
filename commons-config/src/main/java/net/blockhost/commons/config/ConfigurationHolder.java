@@ -125,7 +125,11 @@ public abstract class ConfigurationHolder<T> {
             throw new IllegalStateException(
                     "Cannot save: path or configClass not set. Use save(path, configClass) instead.");
         }
-        ConfigLoader.save(configPath, configClass, get());
+        ConfigLoader.save(
+                configPath,
+                configClass,
+                get(),
+                ConfigLoader.defaultPropertiesBuilder().build());
     }
 
     /// Saves the current configuration to disk.
@@ -133,7 +137,11 @@ public abstract class ConfigurationHolder<T> {
     /// @param path the path to save to
     /// @param configClass the configuration class
     public void save(Path path, Class<T> configClass) {
-        ConfigLoader.save(path, configClass, get());
+        ConfigLoader.save(
+                path,
+                configClass,
+                get(),
+                ConfigLoader.defaultPropertiesBuilder().build());
     }
 
     /// Gets the path where this configuration is stored.

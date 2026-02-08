@@ -13,12 +13,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Objects;
-import java.util.function.Consumer;
 
 /// Utility class for loading and saving configuration files using ConfigLib.
 ///
 /// This class provides a simplified API for working with ConfigLib's YAML configurations,
-/// with sensible defaults and common configuration patterns.
+/// with sensible defaults and common configuration patterns. All methods require explicit
+/// properties, which can be obtained via [#defaultPropertiesBuilder()].
 ///
 /// Example usage:
 /// ```java
@@ -31,10 +31,12 @@ import java.util.function.Consumer;
 ///
 /// // Load or create configuration
 /// Path configPath = dataFolder.resolve("config.yml");
-/// MyConfig config = ConfigLoader.loadOrCreate(configPath, MyConfig.class);
+/// var properties = ConfigLoader.defaultPropertiesBuilder().build();
+/// MyConfig config = ConfigLoader.loadOrCreate(configPath, MyConfig.class, properties);
 ///
 /// // Load with env var resolution (e.g. MYPLUGIN_HOST overrides host)
-/// MyConfig config = ConfigLoader.loadOrCreate(configPath, MyConfig.class, "MYPLUGIN_");
+/// var envProperties = ConfigLoader.defaultPropertiesBuilder("MYPLUGIN_").build();
+/// MyConfig config = ConfigLoader.load(configPath, MyConfig.class, envProperties);
 /// ```
 ///
 /// @see de.exlll.configlib.Configuration
@@ -49,11 +51,6 @@ public class ConfigLoader {
     /// - Adds any new fields that are in the class but not in the file
     /// - Preserves existing values in the file
     /// - Removes fields that are no longer in the class
-    public <T> T loadOrCreate(Path path, Class<T> configClass) {
-        return loadOrCreate(path, configClass, defaultPropertiesBuilder().build());
-    }
-
-    /// Loads a configuration with custom properties.
     public <T> T loadOrCreate(Path path, Class<T> configClass, YamlConfigurationProperties properties) {
         Objects.requireNonNull(path, "path");
         Objects.requireNonNull(configClass, "configClass");
@@ -61,57 +58,9 @@ public class ConfigLoader {
         return YamlConfigurations.update(path, configClass, properties);
     }
 
-    /// Loads or creates a configuration with environment variable resolution.
-    ///
-    /// The file on disk is updated without env var resolution (so resolved values are never
-    /// written to disk), then the configuration is loaded with env var resolution applied.
-    ///
-    /// Environment variables matching `{envPrefix}{FIELD_NAME}` will override configuration values.
-    /// Nested fields use underscores as separators (e.g. `MYPLUGIN_DATABASE_HOST`).
-    ///
-    /// @param path the path to the configuration file
-    /// @param configClass the configuration class
-    /// @param envPrefix the environment variable prefix (e.g. `"MYPLUGIN_"`)
-    /// @param <T> the configuration type
-    /// @return the loaded configuration with env var overrides applied
-    public <T> T loadOrCreate(Path path, Class<T> configClass, String envPrefix) {
-        Objects.requireNonNull(path, "path");
-        Objects.requireNonNull(configClass, "configClass");
-        Objects.requireNonNull(envPrefix, "envPrefix");
-
-        // Update file on disk without env var resolution
-        YamlConfigurations.update(path, configClass, defaultPropertiesBuilder().build());
-        // Load with env var resolution
-        return YamlConfigurations.load(
-                path, configClass, defaultPropertiesBuilder(envPrefix).build());
-    }
-
-    /// Loads a configuration with a customized properties builder.
-    ///
-    /// Example:
-    /// ```java
-    /// MyConfig config = ConfigLoader.loadOrCreate(
-    ///     configPath,
-    ///     MyConfig.class,
-    ///     builder -> builder.header("My Plugin Configuration")
-    /// );
-    /// ```
-    public <T> T loadOrCreate(
-            Path path, Class<T> configClass, Consumer<YamlConfigurationProperties.Builder<?>> propertiesConsumer) {
-        Objects.requireNonNull(path, "path");
-        Objects.requireNonNull(configClass, "configClass");
-        Objects.requireNonNull(propertiesConsumer, "propertiesConsumer");
-        return YamlConfigurations.update(path, configClass, propertiesConsumer);
-    }
-
     /// Saves a configuration to the specified path.
     ///
     /// This will overwrite any existing file at the path.
-    public <T> void save(Path path, Class<T> configClass, T config) {
-        save(path, configClass, config, defaultPropertiesBuilder().build());
-    }
-
-    /// Saves a configuration with custom properties.
     public <T> void save(Path path, Class<T> configClass, T config, YamlConfigurationProperties properties) {
         Objects.requireNonNull(path, "path");
         Objects.requireNonNull(configClass, "configClass");
@@ -124,29 +73,11 @@ public class ConfigLoader {
     ///
     /// Unlike [#loadOrCreate], this method requires the file to exist
     /// and will not create it if missing.
-    public <T> T load(Path path, Class<T> configClass) {
+    public <T> T load(Path path, Class<T> configClass, YamlConfigurationProperties properties) {
         Objects.requireNonNull(path, "path");
         Objects.requireNonNull(configClass, "configClass");
-        return YamlConfigurations.load(
-                path, configClass, defaultPropertiesBuilder().build());
-    }
-
-    /// Loads a configuration from an existing file with environment variable resolution.
-    ///
-    /// Environment variables matching `{envPrefix}{FIELD_NAME}` will override configuration values.
-    /// Nested fields use underscores as separators (e.g. `MYPLUGIN_DATABASE_HOST`).
-    ///
-    /// @param path the path to the configuration file
-    /// @param configClass the configuration class
-    /// @param envPrefix the environment variable prefix (e.g. `"MYPLUGIN_"`)
-    /// @param <T> the configuration type
-    /// @return the loaded configuration with env var overrides applied
-    public <T> T load(Path path, Class<T> configClass, String envPrefix) {
-        Objects.requireNonNull(path, "path");
-        Objects.requireNonNull(configClass, "configClass");
-        Objects.requireNonNull(envPrefix, "envPrefix");
-        return YamlConfigurations.load(
-                path, configClass, defaultPropertiesBuilder(envPrefix).build());
+        Objects.requireNonNull(properties, "properties");
+        return YamlConfigurations.load(path, configClass, properties);
     }
 
     /// Creates a default properties builder with common settings.
@@ -166,21 +97,6 @@ public class ConfigLoader {
                 .setEnvVarResolutionConfiguration(
                         YamlConfigurationProperties.EnvVarResolutionConfiguration.resolveEnvVarsWithPrefix(
                                 envPrefix, false));
-    }
-
-    /// Updates a configuration file, adding new fields and removing obsolete ones.
-    ///
-    /// This method only writes to disk if the content actually changed, avoiding
-    /// unnecessary file modifications and timestamp updates.
-    ///
-    /// @param path the path to the configuration file
-    /// @param configClass the configuration class
-    /// @param <T> the configuration type
-    /// @return the loaded configuration
-    public <T> T updateIfChanged(Path path, Class<T> configClass) {
-        Objects.requireNonNull(path, "path");
-        Objects.requireNonNull(configClass, "configClass");
-        return updateIfChanged(path, configClass, defaultPropertiesBuilder().build());
     }
 
     /// Updates a configuration file with custom properties, only writing if changed.
