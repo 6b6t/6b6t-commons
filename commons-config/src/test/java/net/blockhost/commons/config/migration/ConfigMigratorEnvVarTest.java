@@ -10,7 +10,7 @@ import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class ConfigMigratorSubstitutionTest {
+class ConfigMigratorEnvVarTest {
 
     @TempDir
     Path tempDir;
@@ -41,82 +41,77 @@ class ConfigMigratorSubstitutionTest {
     }
 
     @Test
-    void migrateAndLoad_withSubstitution_resolvesEnvAndSysPatterns() throws Exception {
-        String osName = System.getProperty("os.name");
-
+    void migrateAndLoad_withEnvPrefix_preservesYamlValuesWhenNoMatchingEnvVar() throws Exception {
         Path configFile = tempDir.resolve("config.yml");
         Files.writeString(configFile, """
                 version: 1
-                hostname: ${sys:os.name}
+                hostname: from-yaml
                 port: 3306
                 label: static-value
                 """);
 
         ConfigMigrator migrator =
-                ConfigMigrator.builder().enableSubstitution(true).build();
+                ConfigMigrator.builder().envPrefix("TEST_UNLIKELY_PREFIX_").build();
 
         TestConfig config = migrator.migrateAndLoad(configFile, TestConfig.class, 1);
 
-        assertEquals(osName, config.hostname);
+        // No matching env var, so YAML value is preserved
+        assertEquals("from-yaml", config.hostname);
         assertEquals(3306, config.port);
         assertEquals("static-value", config.label);
     }
 
     @Test
-    void migrateAndLoad_withSubstitution_doesNotWriteSubstitutedValuesToDisk() throws Exception {
+    void migrateAndLoad_withEnvPrefix_doesNotWriteResolvedValuesToDisk() throws Exception {
         Path configFile = tempDir.resolve("config.yml");
         Files.writeString(configFile, """
                 version: 1
-                hostname: ${sys:os.name}
+                hostname: original-value
                 port: 3306
                 label: keep-this
                 """);
 
         ConfigMigrator migrator =
-                ConfigMigrator.builder().enableSubstitution(true).build();
+                ConfigMigrator.builder().envPrefix("TEST_UNLIKELY_PREFIX_").build();
 
         migrator.migrateAndLoad(configFile, TestConfig.class, 1);
 
-        // Verify the file on disk still has the unsubstituted pattern
+        // Verify the file on disk still has the original value
         String fileContent = Files.readString(configFile);
         assertTrue(
-                fileContent.contains("${sys:os.name}"),
-                "File on disk should contain the unsubstituted pattern, but was:\n" + fileContent);
+                fileContent.contains("original-value"),
+                "File on disk should contain the original value, but was:\n" + fileContent);
     }
 
     @Test
-    void migrateAndLoad_withoutSubstitution_leavesPatterns() throws Exception {
+    void migrateAndLoad_withoutEnvPrefix_loadsNormally() throws Exception {
         Path configFile = tempDir.resolve("config.yml");
         Files.writeString(configFile, """
                 version: 1
-                hostname: ${sys:os.name}
+                hostname: yaml-host
                 port: 3306
                 label: test
                 """);
 
-        ConfigMigrator migrator =
-                ConfigMigrator.builder().enableSubstitution(false).build();
+        ConfigMigrator migrator = ConfigMigrator.builder().build();
 
         TestConfig config = migrator.migrateAndLoad(configFile, TestConfig.class, 1);
 
-        // Without substitution enabled, the raw pattern is preserved in the loaded config
-        assertEquals("${sys:os.name}", config.hostname);
+        assertEquals("yaml-host", config.hostname);
     }
 
     @Test
-    void migrateAndLoad_withSubstitutionAndMigration_appliesBoth() throws Exception {
-        String osName = System.getProperty("os.name");
-
+    void migrateAndLoad_withEnvPrefixAndMigration_appliesBoth() throws Exception {
         Path configFile = tempDir.resolve("config.yml");
         Files.writeString(configFile, """
                 version: 1
-                hostname: ${sys:os.name}
+                hostname: yaml-host
                 port: 3306
                 label: original
                 """);
 
         ConfigMigrator migrator = ConfigMigrator.builder()
-                .enableSubstitution(true)
+                .envPrefix("TEST_UNLIKELY_PREFIX_")
                 .register(Migration.of(2, "Add timeout field", ctx -> {
                     ctx.setDefault("timeout", 30);
                 }))
@@ -124,25 +119,25 @@ class ConfigMigratorSubstitutionTest {
 
         MigratedTestConfig config = migrator.migrateAndLoad(configFile, MigratedTestConfig.class, 2);
 
-        // Substitution applied
-        assertEquals(osName, config.hostname);
+        // YAML value preserved (no matching env var)
+        assertEquals("yaml-host", config.hostname);
         // Migration applied
         assertEquals(30, config.timeout);
         assertEquals(2, config.version());
     }
 
     @Test
-    void migrateAndLoad_withSubstitutionAndMigration_diskHasUnsubstitutedMigratedData() throws Exception {
+    void migrateAndLoad_withEnvPrefixAndMigration_diskHasOriginalData() throws Exception {
         Path configFile = tempDir.resolve("config.yml");
         Files.writeString(configFile, """
                 version: 1
-                hostname: ${sys:os.name}
+                hostname: yaml-host
                 port: 3306
                 label: original
                 """);
 
         ConfigMigrator migrator = ConfigMigrator.builder()
-                .enableSubstitution(true)
+                .envPrefix("TEST_UNLIKELY_PREFIX_")
                 .register(Migration.of(2, "Add timeout field", ctx -> {
                     ctx.setDefault("timeout", 30);
                 }))
@@ -150,39 +145,20 @@ class ConfigMigratorSubstitutionTest {
 
         migrator.migrateAndLoad(configFile, MigratedTestConfig.class, 2);
 
-        // Verify disk state: migrated but NOT substituted
+        // Verify disk state: migrated data preserved
         String fileContent = Files.readString(configFile);
-        assertTrue(fileContent.contains("${sys:os.name}"), "File on disk should still contain the pattern");
+        assertTrue(fileContent.contains("yaml-host"), "File on disk should still contain yaml-host");
         assertTrue(
                 fileContent.contains("version: 2") || fileContent.contains("version:2"),
                 "File on disk should have the migrated version");
     }
 
     @Test
-    void migrateAndLoad_withSubstitution_unresolvablePatternsPreserved() throws Exception {
-        Path configFile = tempDir.resolve("config.yml");
-        Files.writeString(configFile, """
-                version: 1
-                hostname: ${env:VERY_UNLIKELY_TO_EXIST_VARIABLE_XYZ_12345}
-                port: 3306
-                label: test
-                """);
-
-        ConfigMigrator migrator =
-                ConfigMigrator.builder().enableSubstitution(true).build();
-
-        TestConfig config = migrator.migrateAndLoad(configFile, TestConfig.class, 1);
-
-        // Unresolvable env vars are left as-is
-        assertEquals("${env:VERY_UNLIKELY_TO_EXIST_VARIABLE_XYZ_12345}", config.hostname);
-    }
-
-    @Test
-    void migrateAndLoad_newFile_withSubstitution_createsDefaults() {
+    void migrateAndLoad_newFile_withEnvPrefix_createsDefaults() {
         Path configFile = tempDir.resolve("nonexistent.yml");
 
         ConfigMigrator migrator =
-                ConfigMigrator.builder().enableSubstitution(true).build();
+                ConfigMigrator.builder().envPrefix("TEST_UNLIKELY_PREFIX_").build();
 
         // Should create with defaults without error
         TestConfig config = migrator.migrateAndLoad(configFile, TestConfig.class, 1);

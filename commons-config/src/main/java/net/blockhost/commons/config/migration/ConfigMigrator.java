@@ -4,10 +4,8 @@ import de.exlll.configlib.YamlConfigurationProperties;
 import de.exlll.configlib.YamlConfigurations;
 import net.blockhost.commons.config.ConfigLoader;
 import net.blockhost.commons.config.VersionAwareConfiguration;
-import net.blockhost.commons.core.text.ConfigSubstitutor;
 import org.jspecify.annotations.Nullable;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -110,7 +108,7 @@ public final class ConfigMigrator {
     private final boolean createBackups;
     private final String backupSuffix;
     private final boolean useTimestampedBackups;
-    private final boolean enableSubstitution;
+    private final @Nullable String envPrefix;
 
     private ConfigMigrator(Builder builder) {
         this.registry = builder.registry;
@@ -122,7 +120,7 @@ public final class ConfigMigrator {
         this.createBackups = builder.createBackups;
         this.backupSuffix = builder.backupSuffix;
         this.useTimestampedBackups = builder.useTimestampedBackups;
-        this.enableSubstitution = builder.enableSubstitution;
+        this.envPrefix = builder.envPrefix;
     }
 
     /// Creates a new migrator builder.
@@ -146,11 +144,10 @@ public final class ConfigMigrator {
     /// 1. Loads the raw YAML data
     /// 2. Reads the current version
     /// 3. Applies necessary migrations
-    /// 4. Saves the migrated data (unsubstituted)
+    /// 4. Saves the migrated data
     /// 5. Syncs the configuration (adds new fields, removes obsolete ones)
     /// 6. Loads the configuration using ConfigLib
-    /// 7. If substitution is enabled, resolves `${env:...}` and `${sys:...}` patterns
-    ///    in memory without writing substituted values to disk
+    /// 7. If an env prefix is set, environment variables with that prefix override config values
     ///
     /// The sync step ensures that even if a migration is imperfect, any new fields
     /// added to the Java class will be written to the file with their default values.
@@ -179,13 +176,12 @@ public final class ConfigMigrator {
         }
 
         // Sync the configuration on disk - adds new fields, removes obsolete ones
-        // Only writes to disk if content actually changed (always unsubstituted)
+        // Only writes to disk if content actually changed
         ConfigLoader.updateIfChanged(path, configClass);
 
-        // If substitution is enabled, load a substituted version in memory
-        if (enableSubstitution) {
-            return loadWithSubstitution(
-                    path, configClass, ConfigLoader.defaultPropertiesBuilder().build());
+        // If env prefix is set, load with env var resolution
+        if (envPrefix != null) {
+            return ConfigLoader.load(path, configClass, envPrefix);
         }
 
         return ConfigLoader.load(path, configClass);
@@ -216,12 +212,12 @@ public final class ConfigMigrator {
             throw result.error().orElseGet(() -> new MigrationException("Migration failed with unknown error"));
         }
 
-        // Sync the configuration on disk (always unsubstituted)
+        // Sync the configuration on disk
         ConfigLoader.updateIfChanged(path, configClass, properties);
 
-        // If substitution is enabled, load a substituted version in memory
-        if (enableSubstitution) {
-            return loadWithSubstitution(path, configClass, properties);
+        // If env prefix is set, load with env var resolution
+        if (envPrefix != null) {
+            return ConfigLoader.load(path, configClass, envPrefix);
         }
 
         return ConfigLoader.load(path, configClass);
@@ -334,28 +330,6 @@ public final class ConfigMigrator {
         return registry;
     }
 
-    /// Loads a configuration with `${env:...}` and `${sys:...}` substitution applied.
-    ///
-    /// Reads the on-disk YAML, applies substitution, writes to a temporary file,
-    /// loads the typed config from the temp file, then deletes the temp file.
-    /// The original file on disk is never modified.
-    private <T> T loadWithSubstitution(Path path, Class<T> configClass, YamlConfigurationProperties properties) {
-        try {
-            String content = Files.readString(path);
-            String substituted = ConfigSubstitutor.substitute(content);
-
-            Path tempFile = Files.createTempFile("config-substituted-", ".yml");
-            try {
-                Files.writeString(tempFile, substituted);
-                return YamlConfigurations.load(tempFile, configClass, properties);
-            } finally {
-                Files.deleteIfExists(tempFile);
-            }
-        } catch (IOException e) {
-            throw new MigrationException("Failed to load configuration with substitution: " + path, e);
-        }
-    }
-
     private void createBackup(Path path) {
         try {
             Path fileNamePath = path.getFileName();
@@ -395,7 +369,7 @@ public final class ConfigMigrator {
         private boolean createBackups;
         private String backupSuffix = ".bak";
         private boolean useTimestampedBackups;
-        private boolean enableSubstitution;
+        private @Nullable String envPrefix;
         private @Nullable Consumer<Migration> beforeMigrationCallback;
         private MigrationExecutor.@Nullable MigrationCallback afterMigrationCallback;
         private @Nullable Consumer<MigrationException> errorCallback;
@@ -420,16 +394,18 @@ public final class ConfigMigrator {
             return this;
         }
 
-        /// Enables or disables environment variable and system property substitution.
+        /// Sets the environment variable prefix for config value resolution.
         ///
-        /// When enabled, `${env:VAR_NAME}` and `${sys:property.name}` patterns in
-        /// configuration values are resolved after migration and schema sync, but
-        /// substituted values are never written back to disk.
+        /// When set, environment variables starting with this prefix can override
+        /// configuration values. For example, with prefix `"MYPLUGIN_"`, the env var
+        /// `MYPLUGIN_DATABASE_HOST` would override the `database.host` config field.
         ///
-        /// @param enable true to enable substitution
+        /// Resolved values are never written back to disk.
+        ///
+        /// @param prefix the environment variable prefix (e.g. `"MYPLUGIN_"`)
         /// @return this builder
-        public Builder enableSubstitution(boolean enable) {
-            this.enableSubstitution = enable;
+        public Builder envPrefix(String prefix) {
+            this.envPrefix = Objects.requireNonNull(prefix, "prefix");
             return this;
         }
 

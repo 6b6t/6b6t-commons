@@ -11,9 +11,6 @@ jedis = "5.2.0"
 # ConfigLib
 configlib = "4.7.0"
 
-# Apache Commons Text
-commons-text = "1.15.0"
-
 # SnakeYAML
 snakeyaml = "2.4"
 
@@ -49,9 +46,6 @@ jedis = { module = "redis.clients:jedis", version.ref = "jedis" }
 
 # ConfigLib
 configlib-yaml = { module = "de.exlll:configlib-yaml", version.ref = "configlib" }
-
-# Apache Commons Text
-commons-text = { module = "org.apache.commons:commons-text", version.ref = "commons-text" }
 
 # SnakeYAML
 snakeyaml = { module = "org.yaml:snakeyaml", version.ref = "snakeyaml" }

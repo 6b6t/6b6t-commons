@@ -31,6 +31,9 @@ import java.util.function.Consumer;
 /// // Load or create configuration
 /// Path configPath = dataFolder.resolve("config.yml");
 /// MyConfig config = ConfigLoader.loadOrCreate(configPath, MyConfig.class);
+///
+/// // Load with env var resolution (e.g. MYPLUGIN_HOST overrides host)
+/// MyConfig config = ConfigLoader.loadOrCreate(configPath, MyConfig.class, "MYPLUGIN_");
 /// ```
 ///
 /// @see de.exlll.configlib.Configuration
@@ -55,6 +58,31 @@ public class ConfigLoader {
         Objects.requireNonNull(configClass, "configClass");
         Objects.requireNonNull(properties, "properties");
         return YamlConfigurations.update(path, configClass, properties);
+    }
+
+    /// Loads or creates a configuration with environment variable resolution.
+    ///
+    /// The file on disk is updated without env var resolution (so resolved values are never
+    /// written to disk), then the configuration is loaded with env var resolution applied.
+    ///
+    /// Environment variables matching `{envPrefix}{FIELD_NAME}` will override configuration values.
+    /// Nested fields use underscores as separators (e.g. `MYPLUGIN_DATABASE_HOST`).
+    ///
+    /// @param path the path to the configuration file
+    /// @param configClass the configuration class
+    /// @param envPrefix the environment variable prefix (e.g. `"MYPLUGIN_"`)
+    /// @param <T> the configuration type
+    /// @return the loaded configuration with env var overrides applied
+    public <T> T loadOrCreate(Path path, Class<T> configClass, String envPrefix) {
+        Objects.requireNonNull(path, "path");
+        Objects.requireNonNull(configClass, "configClass");
+        Objects.requireNonNull(envPrefix, "envPrefix");
+
+        // Update file on disk without env var resolution
+        YamlConfigurations.update(path, configClass, defaultPropertiesBuilder().build());
+        // Load with env var resolution
+        return YamlConfigurations.load(
+                path, configClass, defaultPropertiesBuilder(envPrefix).build());
     }
 
     /// Loads a configuration with a customized properties builder.
@@ -102,9 +130,39 @@ public class ConfigLoader {
                 path, configClass, defaultPropertiesBuilder().build());
     }
 
+    /// Loads a configuration from an existing file with environment variable resolution.
+    ///
+    /// Environment variables matching `{envPrefix}{FIELD_NAME}` will override configuration values.
+    /// Nested fields use underscores as separators (e.g. `MYPLUGIN_DATABASE_HOST`).
+    ///
+    /// @param path the path to the configuration file
+    /// @param configClass the configuration class
+    /// @param envPrefix the environment variable prefix (e.g. `"MYPLUGIN_"`)
+    /// @param <T> the configuration type
+    /// @return the loaded configuration with env var overrides applied
+    public <T> T load(Path path, Class<T> configClass, String envPrefix) {
+        Objects.requireNonNull(path, "path");
+        Objects.requireNonNull(configClass, "configClass");
+        Objects.requireNonNull(envPrefix, "envPrefix");
+        return YamlConfigurations.load(
+                path, configClass, defaultPropertiesBuilder(envPrefix).build());
+    }
+
     /// Creates a default properties builder with common settings.
     public YamlConfigurationProperties.Builder<?> defaultPropertiesBuilder() {
         return YamlConfigurationProperties.newBuilder().setNameFormatter(NameFormatters.LOWER_KEBAB_CASE);
+    }
+
+    /// Creates a default properties builder with environment variable resolution.
+    ///
+    /// @param envPrefix the environment variable prefix (e.g. `"MYPLUGIN_"`)
+    /// @return a builder configured with env var resolution
+    public YamlConfigurationProperties.Builder<?> defaultPropertiesBuilder(String envPrefix) {
+        Objects.requireNonNull(envPrefix, "envPrefix");
+        return defaultPropertiesBuilder()
+                .setEnvVarResolutionConfiguration(
+                        YamlConfigurationProperties.EnvVarResolutionConfiguration.resolveEnvVarsWithPrefix(
+                                envPrefix, false));
     }
 
     /// Updates a configuration file, adding new fields and removing obsolete ones.
