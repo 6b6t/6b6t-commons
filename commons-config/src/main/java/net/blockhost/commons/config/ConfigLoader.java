@@ -1,5 +1,6 @@
 package net.blockhost.commons.config;
 
+import de.exlll.configlib.DeserializationCoercionType;
 import de.exlll.configlib.NameFormatters;
 import de.exlll.configlib.YamlConfigurationProperties;
 import de.exlll.configlib.YamlConfigurations;
@@ -150,7 +151,9 @@ public class ConfigLoader {
 
     /// Creates a default properties builder with common settings.
     public YamlConfigurationProperties.Builder<?> defaultPropertiesBuilder() {
-        return YamlConfigurationProperties.newBuilder().setNameFormatter(NameFormatters.LOWER_KEBAB_CASE);
+        return YamlConfigurationProperties.newBuilder()
+                .setNameFormatter(NameFormatters.LOWER_KEBAB_CASE)
+                .setDeserializationCoercionTypes(DeserializationCoercionType.values());
     }
 
     /// Creates a default properties builder with environment variable resolution.

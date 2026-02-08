@@ -9,7 +9,7 @@ hikaricp = "7.0.2"
 jedis = "5.2.0"
 
 # ConfigLib
-configlib = "4.7.0"
+configlib = "4.8.0"
 
 # SnakeYAML
 snakeyaml = "2.4"
