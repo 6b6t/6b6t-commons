@@ -169,6 +169,65 @@ class ConfigSubstitutorTest {
     }
 
     @Test
+    void substituteValues_coercesSubstitutedIntegerStrings() {
+        System.setProperty("test.port", "3306");
+        try {
+            Map<String, Object> data = new LinkedHashMap<>();
+            data.put("port", "${sys:test.port}");
+
+            Map<String, Object> result = ConfigSubstitutor.substituteValues(data);
+
+            assertEquals(3306, result.get("port"));
+            assertInstanceOf(Integer.class, result.get("port"));
+        } finally {
+            System.clearProperty("test.port");
+        }
+    }
+
+    @Test
+    void substituteValues_coercesSubstitutedBooleanStrings() {
+        System.setProperty("test.enabled", "true");
+        try {
+            Map<String, Object> data = new LinkedHashMap<>();
+            data.put("enabled", "${sys:test.enabled}");
+
+            Map<String, Object> result = ConfigSubstitutor.substituteValues(data);
+
+            assertEquals(true, result.get("enabled"));
+            assertInstanceOf(Boolean.class, result.get("enabled"));
+        } finally {
+            System.clearProperty("test.enabled");
+        }
+    }
+
+    @Test
+    void substituteValues_coercesSubstitutedDoubleStrings() {
+        System.setProperty("test.ratio", "3.14");
+        try {
+            Map<String, Object> data = new LinkedHashMap<>();
+            data.put("ratio", "${sys:test.ratio}");
+
+            Map<String, Object> result = ConfigSubstitutor.substituteValues(data);
+
+            assertEquals(3.14, result.get("ratio"));
+            assertInstanceOf(Double.class, result.get("ratio"));
+        } finally {
+            System.clearProperty("test.ratio");
+        }
+    }
+
+    @Test
+    void substituteValues_doesNotCoerceNonSubstitutedStrings() {
+        Map<String, Object> data = new LinkedHashMap<>();
+        data.put("value", "3306");
+
+        Map<String, Object> result = ConfigSubstitutor.substituteValues(data);
+
+        assertEquals("3306", result.get("value"));
+        assertInstanceOf(String.class, result.get("value"));
+    }
+
+    @Test
     void substitute_doesNotResolveScriptLookup() {
         // Verify that dangerous lookups like script: are not available
         String input = "${script:javascript:java.lang.Runtime.getRuntime().exec('echo')}";

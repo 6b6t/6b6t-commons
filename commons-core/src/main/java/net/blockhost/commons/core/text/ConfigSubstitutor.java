@@ -82,13 +82,46 @@ public class ConfigSubstitutor {
     @SuppressWarnings("unchecked")
     private Object substituteValue(Object value, StringSubstitutor substitutor) {
         if (value instanceof String str) {
-            return substitutor.replace(str);
+            String substituted = substitutor.replace(str);
+            if (!substituted.equals(str)) {
+                return coerceYamlType(substituted);
+            }
+            return substituted;
         }
         if (value instanceof Map<?, ?> map) {
             return substituteMap((Map<String, Object>) map, substitutor);
         }
         if (value instanceof List<?> list) {
             return list.stream().map(item -> substituteValue(item, substitutor)).toList();
+        }
+        return value;
+    }
+
+    /// Attempts to coerce a substituted string to its natural YAML scalar type.
+    ///
+    /// After environment/system property substitution, values like `"3306"` remain
+    /// as strings even though YAML would normally parse the bare literal `3306` as
+    /// an integer. This method converts such strings back to their natural types
+    /// so that configlib deserializers receive the expected object types.
+    ///
+    /// @param value the substituted string
+    /// @return the value coerced to Integer, Long, Double, or Boolean if possible;
+    ///         otherwise the original string
+    private Object coerceYamlType(String value) {
+        try {
+            return Integer.parseInt(value);
+        } catch (NumberFormatException ignored) {
+        }
+        try {
+            return Long.parseLong(value);
+        } catch (NumberFormatException ignored) {
+        }
+        try {
+            return Double.parseDouble(value);
+        } catch (NumberFormatException ignored) {
+        }
+        if ("true".equalsIgnoreCase(value) || "false".equalsIgnoreCase(value)) {
+            return Boolean.parseBoolean(value);
         }
         return value;
     }
