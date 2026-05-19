@@ -9,7 +9,7 @@ hikaricp = "7.0.2"
 jedis = "5.2.0"
 
 # ConfigLib
-configlib = "4.8.0"
+configlib = "8efe7efb4062eb5625df5bef74447835785da6cc"
 
 # SnakeYAML
 snakeyaml = "2.4"
@@ -45,7 +45,7 @@ hikaricp = { module = "com.zaxxer:HikariCP", version.ref = "hikaricp" }
 jedis = { module = "redis.clients:jedis", version.ref = "jedis" }
 
 # ConfigLib
-configlib-yaml = { module = "de.exlll:configlib-yaml", version.ref = "configlib" }
+configlib-yaml = { module = "com.github.6b6t.ConfigLib:configlib-yaml", version.ref = "configlib" }
 
 # SnakeYAML
 snakeyaml = { module = "org.yaml:snakeyaml", version.ref = "snakeyaml" }

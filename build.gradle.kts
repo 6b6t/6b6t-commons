@@ -11,6 +11,12 @@ allprojects {
     version = "1.1.1-SNAPSHOT"
 
     repositories {
+        maven("https://jitpack.io") {
+            name = "JitPack"
+            content {
+                includeGroup("com.github.6b6t.ConfigLib")
+            }
+        }
         maven("https://repo.papermc.io/repository/maven-public/") {
             name = "PaperMC Repository"
         }
