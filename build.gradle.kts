@@ -8,7 +8,7 @@ tasks.named<UpdateDaemonJvm>("updateDaemonJvm") {
 
 allprojects {
     group = "net.blockhost"
-    version = "1.1.1-SNAPSHOT"
+    version = "1.1.2-SNAPSHOT"
 
     repositories {
         maven("https://jitpack.io") {
