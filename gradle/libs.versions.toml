@@ -3,39 +3,39 @@
 java = "25"
 
 # Database
-mariadb = "3.5.6"
-postgresql = "42.7.4"
-hikaricp = "7.0.2"
+mariadb = "3.5.10"
+postgresql = "42.7.13"
+hikaricp = "7.1.0"
 jedis = "5.2.0"
 
 # ConfigLib
 configlib = "8efe7efb4062eb5625df5bef74447835785da6cc"
 
 # SnakeYAML
-snakeyaml = "2.4"
+snakeyaml = "2.7"
 
 # Adventure (MiniMessage)
-adventure = "4.25.0"
+adventure = "4.26.1"
 adventure-platform = "4.3.4"
 
 # Paper API
 paper-api = "1.21.4-R0.1-SNAPSHOT"
 
 # Velocity API
-velocity-api = "3.4.0-SNAPSHOT"
+velocity-api = "3.5.1"
 
 # StrokkCommands
-strokkcommands = "2.0.1"
+strokkcommands = "2.3.0"
 brigadier = "1.4.0"
 
 # Annotations
-jetbrains-annotations = "26.0.2"
-spotbugs-annotations = "4.9.8"
-jspecify = "1.0.0"
+jetbrains-annotations = "26.1.0"
+spotbugs-annotations = "4.10.4"
+jspecify = "1.0.1"
 
 # Testing
-junit = "5.13.0"
-mockito = "5.20.0"
+junit = "5.14.4"
+mockito = "5.23.0"
 
 [libraries]
 # Database
