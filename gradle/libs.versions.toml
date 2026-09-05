@@ -6,7 +6,7 @@ java = "25"
 mariadb = "3.5.6"
 postgresql = "42.7.4"
 hikaricp = "7.0.2"
-jedis = "5.2.0"
+jedis = "8.0.1"
 
 # ConfigLib
 configlib = "8efe7efb4062eb5625df5bef74447835785da6cc"
