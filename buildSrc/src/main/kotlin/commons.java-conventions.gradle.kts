@@ -22,29 +22,29 @@ rewrite {
 }
 
 dependencies {
-    errorprone("com.uber.nullaway:nullaway:0.12.15")
-    errorprone("com.google.errorprone:error_prone_core:2.38.0")
-    spotbugs("com.github.spotbugs:spotbugs:4.9.8")
+    errorprone("com.uber.nullaway:nullaway:0.14.1")
+    errorprone("com.google.errorprone:error_prone_core:2.50.0")
+    spotbugs("com.github.spotbugs:spotbugs:4.10.4")
 
     // OpenRewrite recipes
-    rewrite("org.openrewrite.recipe:rewrite-static-analysis:2.24.0")
-    rewrite("org.openrewrite.recipe:rewrite-migrate-java:3.24.0")
-    rewrite("org.openrewrite.recipe:rewrite-testing-frameworks:3.3.0")
+    rewrite("org.openrewrite.recipe:rewrite-static-analysis:2.41.1")
+    rewrite("org.openrewrite.recipe:rewrite-migrate-java:3.42.1")
+    rewrite("org.openrewrite.recipe:rewrite-testing-frameworks:3.44.0")
 
     // Immutables
-    annotationProcessor("org.immutables:value:2.12.0")
-    compileOnly("org.immutables:value-annotations:2.12.0")
+    annotationProcessor("org.immutables:value:2.12.2")
+    compileOnly("org.immutables:value-annotations:2.12.2")
 
     // Common annotations
-    compileOnly("org.jetbrains:annotations:26.0.2")
-    compileOnly("com.github.spotbugs:spotbugs-annotations:4.9.8")
-    api("org.jspecify:jspecify:1.0.0")
+    compileOnly("org.jetbrains:annotations:26.1.0")
+    compileOnly("com.github.spotbugs:spotbugs-annotations:4.10.4")
+    api("org.jspecify:jspecify:1.0.1")
 
     // Testing
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-    testImplementation("org.junit.jupiter:junit-jupiter:5.13.0")
-    testImplementation("org.mockito:mockito-core:5.20.0")
-    testImplementation("org.mockito:mockito-junit-jupiter:5.20.0")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.14.4")
+    testImplementation("org.mockito:mockito-core:5.23.0")
+    testImplementation("org.mockito:mockito-junit-jupiter:5.23.0")
 }
 
 java {
