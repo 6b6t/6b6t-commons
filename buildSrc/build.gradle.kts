@@ -17,7 +17,7 @@ dependencies {
     // Gradle plugins
     implementation("com.diffplug.spotless:spotless-plugin-gradle:7.2.1")
     implementation("com.github.spotbugs.snom:spotbugs-gradle-plugin:6.5.11")
-    implementation("net.ltgt.errorprone:net.ltgt.errorprone.gradle.plugin:4.4.0")
+    implementation("net.ltgt.errorprone:net.ltgt.errorprone.gradle.plugin:5.1.1")
     implementation("io.freefair.gradle:lombok-plugin:8.14.4")
     implementation("org.openrewrite:plugin:7.41.0")
 }
