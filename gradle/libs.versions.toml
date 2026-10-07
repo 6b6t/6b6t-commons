@@ -15,7 +15,7 @@ configlib = "8efe7efb4062eb5625df5bef74447835785da6cc"
 snakeyaml = "2.7"
 
 # Adventure (MiniMessage)
-adventure = "4.26.1"
+adventure = "5.2.0"
 adventure-platform = "4.3.4"
 
 # Paper API
