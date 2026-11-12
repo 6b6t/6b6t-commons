@@ -22,7 +22,7 @@ adventure-platform = "4.3.4"
 paper-api = "1.21.4-R0.1-SNAPSHOT"
 
 # Velocity API
-velocity-api = "3.5.1"
+velocity-api = "4.3.1"
 
 # StrokkCommands
 strokkcommands = "2.3.1"
