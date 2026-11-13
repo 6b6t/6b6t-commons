@@ -24,7 +24,7 @@ Common utilities and shared code for 6b6t Minecraft plugins.
 
 ### Prerequisites
 
-- Java 25 or higher
+- Latest Java LTS release (currently Java 25)
 - Gradle build tool
 
 ### Maven Repository
@@ -126,3 +126,6 @@ python3 scripts/check-push.py --all
 
 The `--all` command checks working files directly. It does not require a clean tree.
 Normal Git pushes require a clean tree and reject a ref that points to another commit.
+
+Renovate groups Java workflow, daemon, and compiler updates and limits them to LTS releases.
+Run `./gradlew updateDaemonJvm` when updating the daemon version to refresh its download URLs.
