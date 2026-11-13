@@ -9,6 +9,4 @@ dependencies {
     api(libs.adventure.api)
     api(libs.adventure.text.minimessage)
     api(libs.configlib.yaml)
-
-    compileOnly(libs.paper.api)
 }
