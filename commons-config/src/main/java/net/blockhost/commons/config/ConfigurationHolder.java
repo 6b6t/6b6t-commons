@@ -61,8 +61,7 @@ public abstract class ConfigurationHolder<T> {
     ///
     /// @param loader the function that loads the configuration
     protected ConfigurationHolder(Supplier<T> loader) {
-        this.loader = Objects.requireNonNull(loader, "loader");
-        this.configRef = new AtomicReference<>(loader.get());
+        this(loader, Objects.requireNonNull(loader, "loader").get(), null, null);
     }
 
     /// Protected constructor for subclasses with save support.
@@ -71,10 +70,15 @@ public abstract class ConfigurationHolder<T> {
     /// @param configPath the path to save the configuration to
     /// @param configClass the configuration class for saving
     protected ConfigurationHolder(Supplier<T> loader, Path configPath, Class<T> configClass) {
-        this.loader = Objects.requireNonNull(loader, "loader");
+        this(loader, Objects.requireNonNull(loader, "loader").get(), configPath, configClass);
+    }
+
+    private ConfigurationHolder(
+            Supplier<T> loader, T config, @Nullable Path configPath, @Nullable Class<T> configClass) {
+        this.loader = loader;
         this.configPath = configPath;
         this.configClass = configClass;
-        this.configRef = new AtomicReference<>(loader.get());
+        this.configRef = new AtomicReference<>(config);
     }
 
     /// Gets the current configuration instance.
