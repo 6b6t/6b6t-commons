@@ -28,6 +28,7 @@ allprojects {
             content {
                 includeGroup("net.strokkur.commands")
                 includeGroup("net.strokkur")
+                includeGroup("net.strokkur.japutil")
             }
         }
         maven("https://eldonexus.de/repository/maven-snapshots/") {
@@ -38,6 +39,7 @@ allprojects {
             content {
                 includeGroup("net.strokkur.commands")
                 includeGroup("net.strokkur")
+                includeGroup("net.strokkur.japutil")
             }
         }
         mavenCentral()
@@ -46,6 +48,7 @@ allprojects {
 
 // Aggregated Javadoc task for all modules
 tasks.register<Javadoc>("aggregateJavadoc") {
+    notCompatibleWithConfigurationCache("Aggregates Javadoc classpaths from multiple projects")
     group = "documentation"
     description = "Generates aggregated Javadoc for all modules"
 
