@@ -6,19 +6,19 @@ Common utilities and shared code for 6b6t Minecraft plugins.
 
 | Module | Description | Javadoc |
 |--------|-------------|---------|
-| `commons-core` | Core utilities (time formatting, etc.) | [API Docs](https://6b6t.github.io/6b6t-commons/javadoc/commons-core/) |
-| `commons-config` | ConfigLib YAML configuration utilities | [API Docs](https://6b6t.github.io/6b6t-commons/javadoc/commons-config/) |
-| `commons-message` | MiniMessage formatting and messaging | [API Docs](https://6b6t.github.io/6b6t-commons/javadoc/commons-message/) |
-| `commons-commands-core` | StrokkCommands core with Brigadier | [API Docs](https://6b6t.github.io/6b6t-commons/javadoc/commons-commands-core/) |
+| `commons-core` | Core utilities (time formatting, etc.) | [API Docs](https://6b6t.github.io/6b6t-commons/javadoc/net/blockhost/commons/core/package-summary.html) |
+| `commons-config` | ConfigLib YAML configuration utilities | [API Docs](https://6b6t.github.io/6b6t-commons/javadoc/net/blockhost/commons/config/package-summary.html) |
+| `commons-message` | MiniMessage formatting and messaging | [API Docs](https://6b6t.github.io/6b6t-commons/javadoc/net/blockhost/commons/message/package-summary.html) |
+| `commons-commands-core` | StrokkCommands core with Brigadier | [API Docs](https://6b6t.github.io/6b6t-commons/javadoc/net/blockhost/commons/commands/help/package-summary.html) |
 
 ### Database Modules
 
 | Module | Description | Javadoc |
 |--------|-------------|---------|
-| `commons-database-core` | Dialect-independent HikariCP connection pooling | [API Docs](https://6b6t.github.io/6b6t-commons/javadoc/commons-database-core/) |
-| `commons-database-mariadb` | MariaDB/MySQL configuration and support | [API Docs](https://6b6t.github.io/6b6t-commons/javadoc/commons-database-mariadb/) |
-| `commons-database-postgres` | PostgreSQL configuration and support | [API Docs](https://6b6t.github.io/6b6t-commons/javadoc/commons-database-postgres/) |
-| `commons-database-redis` | Redis connectivity with Jedis | [API Docs](https://6b6t.github.io/6b6t-commons/javadoc/commons-database-redis/) |
+| `commons-database-core` | Dialect-independent HikariCP connection pooling | [API Docs](https://6b6t.github.io/6b6t-commons/javadoc/net/blockhost/commons/database/core/package-summary.html) |
+| `commons-database-mariadb` | MariaDB/MySQL configuration and support | [API Docs](https://6b6t.github.io/6b6t-commons/javadoc/net/blockhost/commons/database/mariadb/package-summary.html) |
+| `commons-database-postgres` | PostgreSQL configuration and support | [API Docs](https://6b6t.github.io/6b6t-commons/javadoc/net/blockhost/commons/database/postgres/package-summary.html) |
+| `commons-database-redis` | Redis connectivity with Jedis | [API Docs](https://6b6t.github.io/6b6t-commons/javadoc/net/blockhost/commons/database/redis/package-summary.html) |
 
 ## Installation
 
