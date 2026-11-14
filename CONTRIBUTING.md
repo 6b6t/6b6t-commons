@@ -25,3 +25,8 @@ Clone the repo, then: `./gradlew build`.
 ## Pull requests
 
 Open PRs against the default branch and fill in the PR template. CI validates commit messages. Reviews are routed via [CODEOWNERS](.github/CODEOWNERS).
+
+## Java LTS updates
+
+Renovate groups Java workflow, daemon, and compiler updates and limits them to LTS releases.
+When updating the daemon version, run `./gradlew updateDaemonJvm` to refresh its download URLs.
