@@ -15,11 +15,11 @@ dependencies {
     implementation(files(libs.javaClass.superclass.protectionDomain.codeSource.location))
 
     // Gradle plugins
-    implementation("com.diffplug.spotless:spotless-plugin-gradle:8.11.0")
+    implementation("com.diffplug.spotless:spotless-plugin-gradle:8.12.0")
     implementation("com.github.spotbugs.snom:spotbugs-gradle-plugin:6.5.13")
     implementation("net.ltgt.errorprone:net.ltgt.errorprone.gradle.plugin:5.2.0")
     implementation("io.freefair.gradle:lombok-plugin:9.8.3")
-    implementation("org.openrewrite:plugin:7.39.0")
+    implementation("org.openrewrite:plugin:7.41.0")
 }
 
 java {
