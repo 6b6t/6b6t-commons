@@ -1,3 +1,6 @@
+> [!IMPORTANT]
+> This repository has moved to **[git.6b6t.org/6b6t/6b6t-commons](https://git.6b6t.org/6b6t/6b6t-commons)**. This GitHub copy is archived and no longer updated.
+
 # 6b6t-commons
 
 Common utilities and shared code for 6b6t Minecraft plugins.
